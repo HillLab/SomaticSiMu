@@ -252,7 +252,7 @@ print("Cell 1 of 8 Loaded")
 """
 Input sequence file path
 """
-input_file_path = abs_path("Homo_sapiens.GRCh38.dna.chromosome.22.fasta", "File")
+#input_file_path = abs_path("Homo_sapiens.GRCh38.dna.chromosome.22.fasta", "File")
 # print(input_sequence)
 #input_sequence = seq_slice(input_file_path, 26100000, 27100000)
 
