@@ -10,7 +10,7 @@ $ git clone https://github.com/HillLab/SomaticSiMu
 ```python
 cd /Users/davidchen/Desktop/SomaticSiMu
 
-python SomaticSiMy.py
+python SomaticSiMu.py
 
 Input Simulation Parameters: ['100', 'ColoRect-AdenoCA', '1', '3', '1', 'Homo_sapiens.GRCh38.dna.chromosome.22.fasta', '1', '50818467', '1', '1', '1']
 
