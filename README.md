@@ -12,7 +12,7 @@ cd /Users/davidchen/Desktop/SomaticSiMu
 
 python SomaticSiMy.py
 
-['100', 'ColoRect-AdenoCA', '1', '3', '1', 'Homo_sapiens.GRCh38.dna.chromosome.22.fasta', '1', '50818467', '1', '1', '1']
+Input Simulation Parameters: ['100', 'ColoRect-AdenoCA', '1', '3', '1', 'Homo_sapiens.GRCh38.dna.chromosome.22.fasta', '1', '50818467', '1', '1', '1']
 
 ```
 
