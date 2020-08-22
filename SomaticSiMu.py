@@ -252,10 +252,10 @@ print("Cell 1 of 8 Loaded")
 """
 Input sequence file path
 """
-#input_file_path = abs_path("Homo_sapiens.GRCh38.dna.chromosome.22.fasta", "File")
+input_file_path = abs_path("Homo_sapiens.GRCh38.dna.chromosome.22.fasta", "File")
 # print(input_sequence)
 #input_sequence = seq_slice(input_file_path, 26100000, 27100000)
-
+sig_weights =  pd.read_csv(abs_path("timelines_sigWeights.txt", "File"), sep='\t')
 """
 Read in input reference files:
 data = Pandas Dataframe of number of mutations attributed to each signature for each sample.
@@ -703,7 +703,7 @@ Arguments:
 print("Cell 5 of 8 Loaded")
 
 #%%
-def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, number_of_generations, sequence_abs_path, slice_start, slice_end,power=1, syn_rate=1, non_syn_rate=1):
+def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, simulation_type, sequence_abs_path, slice_start, slice_end,power=1, syn_rate=1, non_syn_rate=1):
     global count_progress
     #INPUT CHECKS
     if reading_frame not in [1, 2, 3]:
@@ -722,8 +722,8 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
         print("number_of_lineages argument must be int type")
         sys.exit()
         
-    if isinstance(number_of_generations, int) == False:
-        print("number_of_generations argument must be int type")
+    if isinstance(simulation_type, str) == False:
+        print("simulation_type argument must be int type")
         sys.exit()
         
     if isinstance(slice_start, int) == False:
@@ -754,14 +754,11 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
     #Necessary for each iteration since child worker must have different numpy seed in multiprocessing
     np.random.seed(int.from_bytes(os.urandom(4), byteorder='little'))
     
-    
     #Output directory paths for mutated sequence and SBS, DBS, Insertion and Deletion frequency matrices
     seq_directory = abs_path("Sample", "Directory")
     mut_mat_directory = abs_path("Frequency_Table", "Directory")
-
+    
     #Setup probabilities into processed dataframes
-    #for i in range(1, number_of_lineages+1):
-        
     print('Lineage ' + str(number_of_lineages))
     
     #Types of mutations for a specific lineage
@@ -770,89 +767,25 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
     sbs_dict={}
     dbs_dict={}
     
-    #Select combination of signatures and set up mutation probabilities for indels
-    id_prop = sig_proportion(cancer_type, id_num_data, std_outlier)
-    id_sig_combination = random.choices(list(id_prop.index), list(id_prop.values))
-
-    id_prob = mut_prob(cancer_type, id_prop_data, id_num_data, id_freq_folder_path, "ID", std_outlier)
-          
-    
-    id_mut_sig_df = pd.concat([id_prob.loc[:47,'Mutation Type':'ID_type'], id_prob[id_sig_combination[0]].dropna()], axis=1)
-        
-    id_total_prob_df = id_mut_sig_df.iloc[:,:5]
-    id_total_prob_df['total_prob']= id_mut_sig_df.loc[:, 'ID_type':].sum(axis=1)
-    id_total_prob_df['total_prob'] = id_total_prob_df['total_prob'].multiply(power)
-       
-    id_sorted_df = id_total_prob_df.sort_values(['ID_type','Index','Size'])
-    id_sorted_df.set_index(['Index'], inplace=True)
-        
-    deletion_df = id_sorted_df.iloc[:12, :]
-    insertion_df = id_sorted_df.iloc[12:24, :]
-        
-    print("Insertion and Deletion mutation probability matrix set up.")
-    print(id_sig_combination)
-    
-    
-    #Select combination of signatures and set up mutation probabilities for single base substitution
-    sbs_prop = sig_proportion(cancer_type, sbs_num_data, std_outlier)
-    sbs_sig_combination = random.choices(list(sbs_prop.index), list(sbs_prop.values))
-       
-    sbs_prob = mut_prob(cancer_type, 
-                       sbs_prop_data,
-                       sbs_num_data, 
-                       sbs_freq_folder_path,
-                       "SBS",
-                       std_outlier)
-    
-    sbs_mut_sig_df = pd.concat([sbs_prob.loc[:,'Type':'SubType'], sbs_prob[sbs_sig_combination[0]]], axis=1)
-    
-    sbs_total_prob_df = sbs_mut_sig_df.iloc[:,:2]
-    sbs_total_prob_df['total_prob'] = sbs_mut_sig_df.iloc[:, 2:].sum(axis=1)
-        
-    sbs_total_prob_df['total_prob'] = sbs_total_prob_df[sbs_total_prob_df.select_dtypes(include=['number']).columns] * power
-    
-    sbs_sorted_df = sbs_total_prob_df.sort_values(['SubType'])
-    sbs_sorted_df.set_index(['SubType'], inplace=True)
-    
-    print("Single Base Substitution mutation probability matrix set up.")
-    print(sbs_sig_combination)
-        
-    #Select combination of signatures and set up mutation probabilities for double base substitution
-    dbs_prop = sig_proportion(cancer_type, dbs_num_data, std_outlier)
-    dbs_sig_combination = random.choices(list(dbs_prop.index), list(dbs_prop.values))    
-     
-    dbs_prob = mut_prob(cancer_type, 
-                       dbs_prop_data,
-                       dbs_num_data, 
-                       dbs_freq_folder_path,
-                       "DBS",
-                       std_outlier)
-       
-    dbs_mut_sig_df = pd.concat([dbs_prob.loc[:,'Mutation Type':'2mer_index'], dbs_prob[dbs_sig_combination[0]]], axis=1)
-    
-    dbs_total_prob_df = dbs_mut_sig_df.copy()    
-    dbs_total_prob_df['total_prob']= dbs_mut_sig_df.iloc[:, 1:].sum(axis=1) 
-    dbs_total_prob_df['total_prob'] = dbs_total_prob_df[dbs_total_prob_df.select_dtypes(include=['number']).columns] * power
-    
-    dbs_sorted_df =  dbs_total_prob_df.sort_values(['Mutation Type'])
-    dbs_sorted_df.set_index(['2mer_index'], inplace=True)   
-    
-    print("Double Base Substitution mutation probability matrix set up.")
-    print(dbs_sig_combination)
-    
     #Initialize one iteration of the sequence to be mutated
     sample_seq = seq_slice(sequence_abs_path, slice_start, slice_end)
     
     #Synonymous codons 
     syn_codon = syn_codon_dict(codon_dict)
     
-    for j in range(1, number_of_generations+1):
+    if simulation_type == "end":
         
-        print('Generation' + str(j))
+        #Select combination of signatures and set up mutation probabilities for indels
+        id_prop = sig_proportion(cancer_type, id_num_data, std_outlier)
+        id_sig_combination = random.choices(list(id_prop.index), list(id_prop.values))
         
-        count_progress += (1/(number_of_generations))*100
+        #Select combination of signatures and set up mutation probabilities for single base substitution
+        sbs_prop = sig_proportion(cancer_type, sbs_num_data, std_outlier)
+        sbs_sig_combination = random.choices(list(sbs_prop.index), list(sbs_prop.values))  
         
-        print(str(count_progress) + '%' , 'Executed ...')
+        #Select combination of signatures and set up mutation probabilities for double base substitution
+        dbs_prop = sig_proportion(cancer_type, dbs_num_data, std_outlier)
+        dbs_sig_combination = random.choices(list(dbs_prop.index), list(dbs_prop.values))  
         
         #Index of each kmer
         sample_index_dict = defaultdict(list)
@@ -866,6 +799,8 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
         
         #Count of each kmer
         sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
+       
+        print('Simulating Tumour Stage End of Lineage ' + str(number_of_lineages))
     
         #Types of mutations for a specific generation  of a specific lineage
         gen_insertion_dict={}
@@ -878,8 +813,63 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
         output_deletion_dict={}
         output_sbs_dict={}
         output_dbs_dict={}
+    
+        id_prob = mut_prob(cancer_type, id_prop_data, id_num_data, id_freq_folder_path, "ID", std_outlier)
+        id_mut_sig_df = pd.concat([id_prob.loc[:47,'Mutation Type':'ID_type'], id_prob[id_sig_combination[0]].dropna()], axis=1)
+            
+        id_total_prob_df = id_mut_sig_df.iloc[:,:5]
+        id_total_prob_df['total_prob']= id_mut_sig_df.loc[:, 'ID_type':].sum(axis=1)
+        id_total_prob_df['total_prob'] = id_total_prob_df['total_prob'].multiply(power)
+           
+        id_sorted_df = id_total_prob_df.sort_values(['ID_type','Index','Size'])
+        id_sorted_df.set_index(['Index'], inplace=True)
+            
+        deletion_df = id_sorted_df.iloc[:12, :]
+        insertion_df = id_sorted_df.iloc[12:24, :]
+            
+        print("Insertion and Deletion mutation probability matrix set up.")
+        print(id_sig_combination)
         
+       
+        sbs_prob = mut_prob(cancer_type, 
+                           sbs_prop_data,
+                           sbs_num_data, 
+                           sbs_freq_folder_path,
+                           "SBS",
+                           std_outlier)
         
+        sbs_mut_sig_df = pd.concat([sbs_prob.loc[:,'Type':'SubType'], sbs_prob[sbs_sig_combination[0]]], axis=1)
+        
+        sbs_total_prob_df = sbs_mut_sig_df.iloc[:,:2]
+        sbs_total_prob_df['total_prob'] = sbs_mut_sig_df.iloc[:, 2:].sum(axis=1)
+            
+        sbs_total_prob_df['total_prob'] = sbs_total_prob_df[sbs_total_prob_df.select_dtypes(include=['number']).columns] * power
+        
+        sbs_sorted_df = sbs_total_prob_df.sort_values(['SubType'])
+        sbs_sorted_df.set_index(['SubType'], inplace=True)
+        
+        print("Single Base Substitution mutation probability matrix set up.")
+        print(sbs_sig_combination)
+            
+        dbs_prob = mut_prob(cancer_type, 
+                           dbs_prop_data,
+                           dbs_num_data, 
+                           dbs_freq_folder_path,
+                           "DBS",
+                           std_outlier)
+           
+        dbs_mut_sig_df = pd.concat([dbs_prob.loc[:,'Mutation Type':'2mer_index'], dbs_prob[dbs_sig_combination[0]]], axis=1)
+        
+        dbs_total_prob_df = dbs_mut_sig_df.iloc[:,:2]   
+        dbs_total_prob_df['total_prob']= dbs_mut_sig_df.iloc[:, 1:].sum(axis=1) 
+        dbs_total_prob_df['total_prob'] = dbs_total_prob_df[dbs_total_prob_df.select_dtypes(include=['number']).columns] * power
+        
+        dbs_sorted_df =  dbs_total_prob_df.sort_values(['Mutation Type'])
+        dbs_sorted_df.set_index(['2mer_index'], inplace=True)   
+        
+        print("Double Base Substitution mutation probability matrix set up.")
+        print(dbs_sig_combination)
+    
         for keys in list(sample_index_dict.keys()):
             
             count=1
@@ -918,8 +908,6 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
                     gen_deletion_dict[deletion_index] = keys[0]
                     output_deletion_dict[deletion_index] = keys[:count]
         
-
-
             #SBS
             if "G" in keys[1] or "A" in keys[1]:
                 pass
@@ -1482,7 +1470,6 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
             row = dbs_mut_freq[(dbs_mut_freq['Mutation Type'] == dbs_count)].index
             dbs_mut_freq.iloc[row[0], 2] += 1
             
-                
         #12 type Single Base Insertion mutation frequency matrix
         ins_mut_freq = insertion_df.copy().iloc[:,:3].reset_index()
         ins_mut_freq['Frequency'] = 0
@@ -1490,7 +1477,6 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
             row = ins_mut_freq[(ins_mut_freq['Index'] == insertion_count)].index
             ins_mut_freq.iloc[row[0], 4] += 1
     
-            
         #12 type Single Base Deletion mutation frequency matrix
         del_mut_freq = deletion_df.copy().iloc[:,:3].reset_index()
         del_mut_freq['Frequency'] = 0
@@ -1517,55 +1503,792 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, num
             offset_index -= 1
       
         #Write mutated sequence to fasta file
-        sample_sequence_file = seq_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages) + '.fasta'
+        sample_sequence_file = seq_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages) + '.fasta'
         with open(sample_sequence_file, 'w+') as fasta_file:
-            fasta_file.write(">" + str(cancer_type) + "_lineage_" + str(number_of_lineages) + "_generation_" + str(j) +'\n')
+            fasta_file.write(">" + str(cancer_type) + "_Lineage_" + str(number_of_lineages) + "_end_stage \n")
+            fasta_file.write("")
             fasta_file.write(sample_seq)
             
         #Write SBS mutation frequency tables to csv file
-        sbs_freq_path = mut_mat_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages)+ '_sbs_freq_table.csv'
+        sbs_freq_path = mut_mat_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_freq_table.csv'
         with open(sbs_freq_path, 'w+'):
             sbs_mut_freq.to_csv(sbs_freq_path, index=False)
             
         #Write DBS mutation frequency tables to csv file
-        dbs_freq_path = mut_mat_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages)+ '_dbs_freq_table.csv'
+        dbs_freq_path = mut_mat_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_dbs_freq_table.csv'
         with open(dbs_freq_path, 'w+'):
             dbs_mut_freq.to_csv(dbs_freq_path, index=False)
           
         #Write Insertion mutation frequency tables to csv file
-        insertion_freq_path = mut_mat_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages)+ '_ins_freq_table.csv'
+        insertion_freq_path = mut_mat_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_ins_freq_table.csv'
         with open(insertion_freq_path, 'w+'):
             ins_mut_freq.to_csv(insertion_freq_path, index=False)
             
         #Write Deletion mutation frequency tables to csv file
-        deletion_freq_path = mut_mat_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages)+ '_del_freq_table.csv'
+        deletion_freq_path = mut_mat_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_del_freq_table.csv'
         with open(deletion_freq_path, 'w+'):
             del_mut_freq.to_csv(deletion_freq_path, index=False)
-            
-            
-            
-            
-        #Write sbs signature frequency tables to csv file
-        sbs_signature_path = mut_mat_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages)+ '_sigs.csv'
-        with open(sbs_signature_path, 'w+'):
-            sbs_sorted_df.to_csv(sbs_signature_path, index=False)
-
-        #Write dbs signature frequency tables to csv file
-        sbs_signature_path = mut_mat_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages)+ '_sbs_sig.csv'
-        with open(sbs_signature_path, 'w+'):
-            sbs_sorted_df.to_csv(sbs_signature_path, index=False)
-            
-        #Write insertion signature frequency tables to csv file
-        insertion_signature_path = mut_mat_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages)+ '_ins_sig.csv'
-        with open(insertion_signature_path, 'w+'):
-            insertion_df.to_csv(insertion_signature_path, index=False)
-            
-        #Write deletion signature frequency tables to csv file
-        deletion_signature_path = mut_mat_directory + "/" + cancer_type + '_Generation_' + str(power * j) + '_Lineage_' + str(number_of_lineages)+ '_del_sig.csv'
-        with open(deletion_signature_path, 'w+'):
-            deletion_df.to_csv(deletion_signature_path, index=False)
+    
+    if simulation_type == "temporal":
         
+        #Select combination of signatures and set up mutation probabilities for indels
+        id_prop = sig_proportion(cancer_type, id_num_data, std_outlier)
+        id_sig_combination = random.choices(list(id_prop.index), list(id_prop.values))
+        #id_sig_combination = [x for x in id_sig_combination[0] if x in sig_weights[sig_weights['cancer_type'] == cancer_type]['signatures'].tolist()]
         
+        #Select combination of signatures and set up mutation probabilities for single base substitution
+        sbs_prop = sig_proportion(cancer_type, sbs_num_data, std_outlier)
+        sbs_sig_combination = random.choices(list(sbs_prop.index), list(sbs_prop.values))  
+        sbs_sig_combination = [x for x in sbs_sig_combination[0] if x in sig_weights[sig_weights['cancer_type'] == cancer_type]['signatures'].tolist()]
+        
+        #Select combination of signatures and set up mutation probabilities for double base substitution
+        dbs_prop = sig_proportion(cancer_type, dbs_num_data, std_outlier)
+        dbs_sig_combination = random.choices(list(dbs_prop.index), list(dbs_prop.values))  
+        #dbs_sig_combination = [x for x in dbs_sig_combination[0] if x in sig_weights[sig_weights['cancer_type'] == cancer_type]['signatures'].tolist()]
+         
+        for i in ["Early", "Late"]:
+            
+            #Index of each kmer
+            sample_index_dict = defaultdict(list)
+        
+            for seq_len in range(0, len(sample_seq)-6):
+                if 'N' in sample_seq[seq_len:seq_len+6]:
+                    pass
+        
+                else:
+                    sample_index_dict[str(sample_seq[seq_len:seq_len+6])].append(seq_len)
+            
+            #Count of each kmer
+            sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
+           
+            print('Simulating Tumour Stage ' + str(i)+ ' of Lineage ' + str(number_of_lineages))
+        
+            #Types of mutations for a specific generation  of a specific lineage
+            gen_insertion_dict={}
+            gen_deletion_dict={}
+            gen_sbs_dict={}
+            gen_dbs_dict={}  
+            
+            #Types of mutations for a specific lineage and generation to be outputted as a frequency matrix
+            output_insertion_dict={}
+            output_deletion_dict={}
+            output_sbs_dict={}
+            output_dbs_dict={}
+        
+            id_prob = mut_prob(cancer_type, id_prop_data, id_num_data, id_freq_folder_path, "ID", std_outlier)
+            id_mut_sig_df = pd.concat([id_prob.loc[:47,'Mutation Type':'ID_type'], id_prob[id_sig_combination[0]].dropna()], axis=1)
+                
+            id_total_prob_df = id_mut_sig_df.iloc[:,:5]
+            id_total_prob_df['total_prob']= id_mut_sig_df.loc[:, 'ID_type':].sum(axis=1)
+            id_total_prob_df['total_prob'] = id_total_prob_df['total_prob'].multiply(power)
+               
+            id_sorted_df = id_total_prob_df.sort_values(['ID_type','Index','Size'])
+            id_sorted_df.set_index(['Index'], inplace=True)
+                
+            deletion_df = id_sorted_df.iloc[:12, :]
+            insertion_df = id_sorted_df.iloc[12:24, :]
+                
+            print("Insertion and Deletion mutation probability matrix set up.")
+            print(id_sig_combination)
+            
+           
+            sbs_prob = mut_prob(cancer_type, 
+                               sbs_prop_data,
+                               sbs_num_data, 
+                               sbs_freq_folder_path,
+                               "SBS",
+                               std_outlier)
+            
+            #Constant multiplier for SBS signature activity that differs between early and late stages
+            weights = sig_weights[sig_weights['cancer_type'] == cancer_type].set_index("signatures")
+            for j in sbs_sig_combination:
+                sbs_prob[j] = sbs_prob[j]*weights.loc[j,i.lower()]
+            
+            sbs_mut_sig_df = pd.concat([sbs_prob.loc[:,'Type':'SubType'], sbs_prob[sbs_sig_combination[0]]], axis=1)
+            
+            sbs_total_prob_df = sbs_mut_sig_df.iloc[:,:2]
+            sbs_total_prob_df['total_prob'] = sbs_mut_sig_df.iloc[:, 2:].sum(axis=1)
+                
+            sbs_total_prob_df['total_prob'] = sbs_total_prob_df[sbs_total_prob_df.select_dtypes(include=['number']).columns] * power
+            
+            sbs_sorted_df = sbs_total_prob_df.sort_values(['SubType'])
+            sbs_sorted_df.set_index(['SubType'], inplace=True)
+            
+            print("Single Base Substitution mutation probability matrix set up.")
+            print(sbs_sig_combination)
+                
+            dbs_prob = mut_prob(cancer_type, 
+                               dbs_prop_data,
+                               dbs_num_data, 
+                               dbs_freq_folder_path,
+                               "DBS",
+                               std_outlier)
+               
+            dbs_mut_sig_df = pd.concat([dbs_prob.loc[:,'Mutation Type':'2mer_index'], dbs_prob[dbs_sig_combination[0]]], axis=1)
+            
+            dbs_total_prob_df = dbs_mut_sig_df.copy()    
+            dbs_total_prob_df['total_prob']= dbs_mut_sig_df.iloc[:, 1:].sum(axis=1) 
+            dbs_total_prob_df['total_prob'] = dbs_total_prob_df[dbs_total_prob_df.select_dtypes(include=['number']).columns] * power
+            
+            dbs_sorted_df =  dbs_total_prob_df.sort_values(['Mutation Type'])
+            dbs_sorted_df.set_index(['2mer_index'], inplace=True)   
+            
+            print("Double Base Substitution mutation probability matrix set up.")
+            print(dbs_sig_combination)
+        
+            for keys in list(sample_index_dict.keys()):
+                
+                count=1
+                for length in list(range(1, len(keys))):
+                    if keys[length] == keys[0]:
+                        count += 1
+                    else:
+                        break
+          
+                #Insertion
+                if "G" in keys[:count] or "A" in keys[:count]:
+                    pass
+                
+                else:
+                    temp_i_prob = [insertion_df.loc[insertion_df['Size'] == count].loc[keys[:count],'total_prob']] 
+                    insertion_count = np.random.binomial(sample_count_dict[keys], temp_i_prob, 1) 
+                
+                    for m in range(sum(i_number > 0 for i_number in list(insertion_count))):
+                        insertion_index = np.random.choice(sample_index_dict[keys])
+                        insertion_dict[insertion_index] = keys[0]
+                        gen_insertion_dict[insertion_index] = keys[0]
+                        output_insertion_dict[insertion_index] = keys[:count]
+                    
+                    
+                #Deletion
+                if "G" in keys[:count] or "A" in keys[:count]:
+                    pass
+                
+                else:
+                    temp_d_prob = [deletion_df.loc[deletion_df['Size'] == count].loc[keys[:count],'total_prob']] 
+                    deletion_count = np.random.binomial(sample_count_dict[keys], temp_d_prob, 1)  
+                
+                    for n in range(sum(d_number > 0 for d_number in list(deletion_count))):
+                        deletion_index = np.random.choice(sample_index_dict[keys])
+                        deletion_dict[deletion_index] = keys[0]
+                        gen_deletion_dict[deletion_index] = keys[0]
+                        output_deletion_dict[deletion_index] = keys[:count]
+            
+                #SBS
+                if "G" in keys[1] or "A" in keys[1]:
+                    pass
+                
+                else:
+                    sbs_types = list(sbs_sorted_df.loc[keys[:3],'Type']) + [None]
+                    sbs_prob = list(sbs_sorted_df.loc[keys[:3],'total_prob'])+ [1- sum(list(sbs_sorted_df.loc[keys[:3],'total_prob']))]             
+                    sbs = [sbs_num for sbs_num in list(np.random.choice(sbs_types,p=sbs_prob, size = sample_count_dict[keys])) if sbs_num]
+                    for sbs_value in sbs:
+                        single_base_index = np.random.choice(sample_index_dict[keys])
+                        sbs_dict[single_base_index] = sbs_value[2]
+                        gen_sbs_dict[single_base_index] = sbs_value[2]
+                        output_sbs_dict[single_base_index] = [sbs_value, sample_seq[single_base_index:single_base_index+3]]
+                             
+                #DBS   
+                if keys[:2] in dbs_sorted_df.index:
+                    dbs_types = list(dbs_sorted_df.loc[keys[:2],'Mutation Type']) + [None]     
+                    dbs_prob = list(dbs_sorted_df.loc[keys[:2],'total_prob'])+ [1- sum(list(dbs_sorted_df.loc[keys[:2],'total_prob']))]
+                    dbs = [dbs_num for dbs_num in list(np.random.choice(dbs_types,p=dbs_prob, size = sample_count_dict[keys])) if dbs_num]
+                    for dbs_value in dbs:
+                        double_base_index = np.random.choice(sample_index_dict[keys])
+                        dbs_dict[double_base_index] = dbs_value[3:]
+                        gen_dbs_dict[double_base_index] = dbs_value[3:]
+                        output_dbs_dict[double_base_index] = dbs_value
+                        
+                else:
+                    pass
+                
+            #SBS Synonymous/Non-Synonymous
+            #Reading frame starts at the first base
+            if reading_frame == 1:
+                
+                #Apply syn/non-syn mutation rate for SBS
+                for mut in list(gen_sbs_dict.keys()):
+                
+                    read_index = mut%3
+                
+                    #First base of codon
+                    if read_index == 1:
+                        
+                        if gen_sbs_dict[mut] + sample_seq[mut+1:mut+3] == sample_seq[mut:mut+3]:
+                            pass
+                        
+                        if gen_sbs_dict[mut] + sample_seq[mut+1:mut+3] in syn_codon[sample_seq[mut:mut+3]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                        
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                                       
+                    #Second base of codon     
+                    if read_index == 2:
+                        
+                        if sample_seq[mut-1] + gen_sbs_dict[mut] + sample_seq[mut+1] == sample_seq[mut-1:mut+2]:
+                            pass
+                        
+                        if sample_seq[mut-1] + gen_sbs_dict[mut] + sample_seq[mut+1] in syn_codon[sample_seq[mut-1:mut+2]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                                             
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                
+                    #Third base of codon     
+                    if read_index == 0:
+                        
+                        if sample_seq[mut-2:mut] + gen_sbs_dict[mut] == sample_seq[mut-2:mut+1]:
+                            pass
+                        
+                        if sample_seq[mut-2:mut] + gen_sbs_dict[mut] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                               
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                
+            #Reading frame starts at the second base
+            if reading_frame == 2:
+                
+                #Apply syn/non-syn mutation rate for SBS
+                for mut in list(gen_sbs_dict.keys()):
+                
+                    read_index = mut%3
+                
+                    #First base of codon
+                    if read_index == 2:
+                        
+                        if gen_sbs_dict[mut] + sample_seq[mut+1:mut+3] == sample_seq[mut:mut+3]:
+                            pass
+                        
+                        if gen_sbs_dict[mut] + sample_seq[mut+1:mut+3] in syn_codon[sample_seq[mut:mut+3]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                               
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                                       
+                        #Second base of codon     
+                    if read_index == 0:
+                        
+                        if sample_seq[mut-1] + gen_sbs_dict[mut] + sample_seq[mut+1] == sample_seq[mut-1:mut+2]:
+                            pass
+                        
+                        if sample_seq[mut-1] + gen_sbs_dict[mut] + sample_seq[mut+1] in syn_codon[sample_seq[mut-1:mut+2]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                                             
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                
+                    #Third base of codon     
+                    if read_index == 1:
+                        
+                        if sample_seq[mut-2:mut] + gen_sbs_dict[mut] == sample_seq[mut-2:mut+1]:
+                            pass
+                        
+                        if sample_seq[mut-2:mut] + gen_sbs_dict[mut] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                               
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                
+            #Reading frame starts at the third base
+            if reading_frame == 3:
+                
+                #Apply syn/non-syn mutation rate for SBS
+                for mut in list(gen_sbs_dict.keys()):
+                
+                    read_index = mut%3
+                
+                    #First base of codon
+                    if read_index == 0:
+                        
+                        if gen_sbs_dict[mut] + sample_seq[mut+1:mut+3] == sample_seq[mut:mut+3]:
+                            pass
+                        
+                        if gen_sbs_dict[mut] + sample_seq[mut+1:mut+3] in syn_codon[sample_seq[mut:mut+3]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                               
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                                       
+                    #Second base of codon     
+                    if read_index == 1:
+                        
+                        if sample_seq[mut-1] + gen_sbs_dict[mut] + sample_seq[mut+1] == sample_seq[mut-1:mut+2]:
+                            pass
+                        
+                        if sample_seq[mut-1] + gen_sbs_dict[mut] + sample_seq[mut+1] in syn_codon[sample_seq[mut-1:mut+2]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                                             
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 2:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                
+                    #Third base of codon     
+                    if read_index == 0:
+                        
+                        if sample_seq[mut-2:mut] + gen_sbs_dict[mut] == sample_seq[mut-2:mut+1]:
+                            pass
+                        
+                        if sample_seq[mut-2:mut] + gen_sbs_dict[mut] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                               
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del sbs_dict[mut]
+                                del output_sbs_dict[mut]
+                                
+            #DBS Synonymous/Non-Synonymous
+            
+            #Reading frame starts at the first base
+            if reading_frame == 1:
+                
+                #Apply syn/non-syn mutation rate for DBS
+                for mut in list(gen_dbs_dict.keys()):
+                
+                    read_index = mut%3
+                
+                    #First + second base of codon
+                    if read_index == 1:
+                        
+                        if gen_dbs_dict[mut] + sample_seq[mut+2] == sample_seq[mut:mut+3]:
+                            pass
+                        
+                        if gen_dbs_dict[mut] + sample_seq[mut+2] in syn_codon[sample_seq[mut:mut+3]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                               
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                                       
+                    #Second + third base of codon     
+                    if read_index == 2:
+                        
+                        if sample_seq[mut-1] + gen_dbs_dict[mut]  == sample_seq[mut-1:mut+2]:
+                            pass
+                        
+                        if sample_seq[mut-1] + gen_dbs_dict[mut] in syn_codon[sample_seq[mut-1:mut+2]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                                             
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                
+                    #Third base of codon and first base of next adjacent codon    
+                    if read_index == 0:
+                        
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
+                            pass
+                            
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
+                            pass
+                        
+                        #Check if first codon of original sequence is synonymous to mutated codon
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                           
+                        #Check if second codon of original sequence is synonymous to mutated codon
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                            
+                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                pass
+                                
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                           
+                        #Both mutated codons are non-synonymous to their original sequence codon                           
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+            
+            #Reading frame starts at the second base
+            if reading_frame == 2:
+                
+                #Apply syn/non-syn mutation rate for DBS
+                for mut in list(gen_dbs_dict.keys()):
+                
+                    read_index = mut%3
+                
+                    #First + second base of codon
+                    if read_index == 2:
+                        
+                        if gen_dbs_dict[mut] + sample_seq[mut+2] == sample_seq[mut:mut+3]:
+                            pass
+                        
+                        if gen_dbs_dict[mut] + sample_seq[mut+2] in syn_codon[sample_seq[mut:mut+3]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                               
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                                       
+                    #Second + third base of codon     
+                    if read_index == 0:
+                        
+                        if sample_seq[mut-1] + gen_dbs_dict[mut]  == sample_seq[mut-1:mut+2]:
+                            pass
+                        
+                        if sample_seq[mut-1] + gen_dbs_dict[mut] in syn_codon[sample_seq[mut-1:mut+2]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                                             
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                
+                    #Third base of codon and first base of next adjacent codon    
+                    if read_index == 1:
+                        
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
+                            pass
+                            
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
+                            pass
+                        
+                        #Check if first codon of original sequence is synonymous to mutated codon
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                           
+                        #Check if second codon of original sequence is synonymous to mutated codon
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                            
+                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                pass
+                                
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                           
+                        #Both mutated codons are non-synonymous to their original sequence codon                           
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                
+            #Reading frame starts at the third base
+            if reading_frame == 3:
+                
+                #Apply syn/non-syn mutation rate for DBS
+                for mut in list(gen_dbs_dict.keys()):
+                
+                    read_index = mut%3
+                
+                    #First + second base of codon
+                    if read_index == 0:
+                        
+                        if gen_dbs_dict[mut] + sample_seq[mut+2] == sample_seq[mut:mut+3]:
+                            pass
+                        
+                        if gen_dbs_dict[mut] + sample_seq[mut+2] in syn_codon[sample_seq[mut:mut+3]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                               
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                                       
+                    #Second + third base of codon     
+                    if read_index == 1:
+                        
+                        if sample_seq[mut-1] + gen_dbs_dict[mut]  == sample_seq[mut-1:mut+2]:
+                            pass
+                        
+                        if sample_seq[mut-1] + gen_dbs_dict[mut] in syn_codon[sample_seq[mut-1:mut+2]]:
+                            syn_mutation = random.choices([1,2],[syn_rate, 1-syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                                             
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                                
+                    #Third base of codon and first base of next adjacent codon    
+                    if read_index == 2:
+                        
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
+                            pass
+                            
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
+                            pass
+                        
+                        #Check if first codon of original sequence is synonymous to mutated codon
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                           
+                        #Check if second codon of original sequence is synonymous to mutated codon
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                            
+                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                pass
+                                
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                           
+                        #Both mutated codons are non-synonymous to their original sequence codon                           
+                        else:
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                   
+            
+            #96 type SBS mutation frequency matrix
+            sbs_mut_freq = sbs_sorted_df.copy().iloc[:,:1].reset_index()
+            sbs_mut_freq['Frequency'] = 0
+            for sbs_count in list(output_sbs_dict.values()):
+                row = sbs_mut_freq[(sbs_mut_freq['SubType'] == sbs_count[1]) & (sbs_mut_freq['Type'] == sbs_count[0])].index
+                sbs_mut_freq.iloc[row[0], 2] += 1
+        
+            #78 type DBS mutation frequency matrix
+            dbs_mut_freq = dbs_sorted_df.copy().iloc[:,:1].reset_index()
+            dbs_mut_freq['Frequency'] = 0
+            for dbs_count in list(output_dbs_dict.values()):
+                row = dbs_mut_freq[(dbs_mut_freq['Mutation Type'] == dbs_count)].index
+                dbs_mut_freq.iloc[row[0], 2] += 1
+                
+            #12 type Single Base Insertion mutation frequency matrix
+            ins_mut_freq = insertion_df.copy().iloc[:,:3].reset_index()
+            ins_mut_freq['Frequency'] = 0
+            for insertion_count in list(output_insertion_dict.values()):
+                row = ins_mut_freq[(ins_mut_freq['Index'] == insertion_count)].index
+                ins_mut_freq.iloc[row[0], 4] += 1
+          
+            #12 type Single Base Deletion mutation frequency matrix
+            del_mut_freq = deletion_df.copy().iloc[:,:3].reset_index()
+            del_mut_freq['Frequency'] = 0
+            for deletion_count in list(output_deletion_dict.values()):
+                row = del_mut_freq[(del_mut_freq['Index'] == deletion_count)].index
+                del_mut_freq.iloc[row[0], 4] += 1
+                
+            #Apply the mutations linearly 
+            for index_sbs in list(sbs_dict.keys()):
+                sample_seq = sample_seq[:index_sbs] + sbs_dict[index_sbs] + sample_seq[index_sbs+1:]
+        
+            for index_dbs in list(dbs_dict.keys()):
+                sample_seq = sample_seq[:index_dbs] + dbs_dict[index_dbs] + sample_seq[index_dbs+2:]
+        
+            #Index of mutation adjusts each time an insertion or deletion is added linearly
+            offset_index = 0
+            
+            for index_insertion in sorted(list(insertion_dict.keys())):
+                sample_seq = sample_seq[:int(index_insertion) + offset_index] + insertion_dict[index_insertion] + sample_seq[int(index_insertion) + offset_index:]
+                offset_index += 1
+                
+            for index_deletion in sorted(list(deletion_dict.keys())):
+                sample_seq = sample_seq[:int(index_deletion) + offset_index] + sample_seq[int(index_deletion) + 1 + offset_index:]
+                offset_index -= 1
+          
+            #Write mutated sequence to fasta file
+            sample_sequence_file = seq_directory + "/" + cancer_type + '_' + str(i) + '_Stage_Lineage_' + str(number_of_lineages) + '.fasta'
+            with open(sample_sequence_file, 'w+') as fasta_file:
+                fasta_file.write(">" + str(cancer_type) + "_Lineage_" + str(number_of_lineages) + str(i) + "_stage \n")
+                fasta_file.write("")
+                fasta_file.write(sample_seq)
+                
+            #Write SBS mutation frequency tables to csv file
+            sbs_freq_path = mut_mat_directory + "/" + cancer_type + '_'+ str(i) + '_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_freq_table.csv'
+            with open(sbs_freq_path, 'w+'):
+                sbs_mut_freq.to_csv(sbs_freq_path, index=False)
+                
+            #Write DBS mutation frequency tables to csv file
+            dbs_freq_path = mut_mat_directory + "/" + cancer_type + '_'+ str(i) + '_Stage_Lineage_' + str(number_of_lineages)+ '_dbs_freq_table.csv'
+            with open(dbs_freq_path, 'w+'):
+                dbs_mut_freq.to_csv(dbs_freq_path, index=False)
+              
+            #Write Insertion mutation frequency tables to csv file
+            insertion_freq_path = mut_mat_directory + "/" + cancer_type + '_'+ str(i) + '_Stage_Lineage_' + str(i) + '_Lineage_' + str(number_of_lineages)+ '_ins_freq_table.csv'
+            with open(insertion_freq_path, 'w+'):
+                ins_mut_freq.to_csv(insertion_freq_path, index=False)
+                
+            #Write Deletion mutation frequency tables to csv file
+            deletion_freq_path = mut_mat_directory + "/" + cancer_type + '_'+ str(i) + '_Stage_Lineage_' + str(number_of_lineages)+ '_del_freq_table.csv'
+            with open(deletion_freq_path, 'w+'):
+                del_mut_freq.to_csv(deletion_freq_path, index=False)
+            
         
 #Cell 6 Loaded
 print("Cell 6 (SomaticSiMu) of 8 Loaded")
@@ -1591,7 +2314,7 @@ def multiprocessing_func( p ):
                 reading_frame = int(arg[2]) , 
                 std_outlier = int(arg[3]) , 
                 number_of_lineages = number_of_lineages , 
-                number_of_generations = int(arg[4]) , 
+                simulation_type = arg[4] , 
                 sequence_abs_path = abs_path( arg[5].strip() , "File"), 
                 slice_start = int(arg[6]) , 
                 slice_end = int(arg[7]) , 
@@ -1599,8 +2322,10 @@ def multiprocessing_func( p ):
                 syn_rate= int(arg[9]) , 
                 non_syn_rate=int(arg[-1]) ,  
                 ) 
-    except Exception as e:
-        messagebox.showinfo( 'Window title'  , 'Error :- ' + '\n ' + str(e) ,  parent= screen1 )
+    except:
+        pass
+    #except Exception as e:
+    #    messagebox.showinfo( 'Window title'  , 'Error :- ' + '\n ' + str(e) ,  parent= screen1 )
 
 
 
@@ -1665,9 +2390,9 @@ def open_img(root , name):
 
 def gui():
     
-    global screen1 , tim
+    global screen1 
 
-    global Number_of_lineages , Cancer_type , Reading_frame ,  Std_outlier , Number_of_generations , Sequence_abs_path , Slice_start , Slice_end , Power , Syn_rate , Non_syn_rate 
+    global Number_of_lineages , Cancer_type , Reading_frame ,  Std_outlier , Simulation_type , Sequence_abs_path , Slice_start , Slice_end , Power , Syn_rate , Non_syn_rate 
 
     screen1 = Toplevel() 
     screen1.title('SomaticSiMu')
@@ -1686,7 +2411,7 @@ def gui():
     Sequence_abs_path.place(x = 80 , y = 100)
 
     n = StringVar() 
-    Button(screen1 , text = 'Cancer-type'  , bg= 'White' , fg = 'Black' , font = ('Helvitka' , 10 , 'bold' ) , command = lambda : open_img( screen1 , abs_path('cancer_type.png', "File" ) )).place(x = 80 , y = 140)  
+    Button(screen1 , text = 'Cancer_type'  , bg= 'White' , fg = 'Black' , font = ('Helvitka' , 10 , 'bold' ) , command = lambda : open_img( screen1 , abs_path('cancer_type.png', "File" ) )).place(x = 80 , y = 140)  
     Cancer_type = ttk.Combobox( screen1 , height = 12 , width = 14 ,textvariable = n) 
     Cancer_type['values'] = ( cancer_type_list ) 
     Cancer_type.place(x = 80 , y= 160) 
@@ -1703,17 +2428,17 @@ def gui():
     Reading_frame.place(x = 80 , y = 280)
     Reading_frame.current() 
 
-
     Button( screen1 , text = 'Number_of_lineages',bg= 'White' , fg = 'Black' , font = ('Helvitka' , 10 , 'bold' ) , command = lambda: open_img( screen1 , abs_path('number_of_lineage.png', "File" )  )).place(x = 80 , y = 320)
     Number_of_lineages =  Entry( screen1 , font = ( 'verdana' , 10 ) ) #Box to type in a whole number integer
     Number_of_lineages.place( x =  80 , y = 340 )
 
-
-    Button( screen1 , text = 'Number_of_generations' , bg= 'White' , fg = 'Black' , font = ('Helvitka' , 10 , 'bold' ) ,  command = lambda : open_img( screen1 , abs_path('number_of_generation.png', "File" ) ) ).place(x = 80 , y = 380)
-    Number_of_generations = Entry( screen1 , font = ( 'verdana' , 10 ) )  #Box to type in integer number
-    Number_of_generations.place(x = 80 , y = 400)
-
-
+    Button( screen1 , text = 'Simulation_type' , bg= 'White' , fg = 'Black' , font = ('Helvitka' , 10 , 'bold' ) ,  command = lambda : open_img( screen1 , abs_path('simulation_type.png', "File" ) ) ).place(x = 80 , y = 380)
+    n3=StringVar()
+    Simulation_type = ttk.Combobox( screen1 , height = 12 , width = 14 ,textvariable = n3) #Drop down menu for the simulation of temporal or end stage mutation signature activities
+    Simulation_type['values'] = (["temporal", "end"])
+    Simulation_type.place( x=80, y=400)
+    Simulation_type.current()
+  
     Button( screen1 , text = 'Slice_start', bg= 'White' , fg = 'Black' , font = ('Helvitka' , 10 , 'bold' ) ,  command = lambda : open_img( screen1 , abs_path('slice_start.png', "File" ) )  ).place(x = 360  , y = 80)
     Slice_start = Entry( screen1 , font = ( 'verdana' , 10 ) )  #Box to type in integer number
     Slice_start.place(x = 360  , y = 100)
@@ -1734,7 +2459,7 @@ def gui():
     Non_syn_rate = Entry( screen1 , font = ( 'verdana' , 10 ) )  #Box to type in float number
     Non_syn_rate.place(x = 360 , y = 340)
 
-    Button( screen1 , text = 'Simulate' , bg='White' , fg=  'Black'  , font = ('Helvitka' , 18 , 'bold') , command = lambda : run( Number_of_lineages , Cancer_type , Reading_frame ,  Std_outlier , Number_of_generations , Sequence_abs_path , Slice_start , Slice_end , Power , Syn_rate , Non_syn_rate  ) ).place(x = 360 , y = 400 )
+    Button( screen1 , text = 'Simulate' , bg='White' , fg=  'Black'  , font = ('Helvitka' , 18 , 'bold') , command = lambda : run( Number_of_lineages , Cancer_type , Reading_frame ,  Std_outlier , Simulation_type , Sequence_abs_path , Slice_start , Slice_end , Power , Syn_rate , Non_syn_rate  ) ).place(x = 360 , y = 400 )
     
 #Cell 7 Loaded
 print("Cell 7 (Simulation) of 8 Loaded")
@@ -1767,9 +2492,12 @@ def gui2():
     Cancer_type2.place(x =60 , y= 100) 
     Cancer_type2.current() 
 
-    Button( screen2 , text = 'Number_of_lineage', bg= 'White' , fg = 'Black' , font = ('Helvitka' , 12 , 'bold' ) , command = lambda : open_img( screen2 , abs_path('viz_number_of_lineage.png', "File" ) ) ).place(x = 290 , y = 80)
-    lineages =  Entry( screen2 , font = ( 'verdana' , 10 ) ) #Box to type in a whole number integer
-    lineages.place( x =  290 , y = 100 )
+    n5 = StringVar() 
+    Button(screen2 , text = 'Simulation_type',bg= 'White' , fg = 'Black'  , font = ('Helvitka' , 12 , 'bold' ) , command = lambda : open_img( screen2 , abs_path('simulation_type.png', "File" ))).place(x = 290 , y = 80)  
+    Sim_type2 = ttk.Combobox( screen2 , height = 12 , width = 14 ,textvariable = n5)
+    Sim_type2['values'] = ( ['Early', 'Late' , 'End'] )  
+    Sim_type2.place(x = 290 , y= 100) 
+    Sim_type2.current() 
 
     Button( screen2 , text = 'Gen_start', bg= 'White' , fg = 'Black' , font = ('Helvitka' , 12 , 'bold' ),command = lambda : open_img( screen2 , abs_path('viz_gen_start.png', "File" ) ) ).place(x = 60 , y = 150)
     Gen_start = Entry( screen2 , font = ( 'verdana' , 10 ) )  #Box to type in integer number
@@ -1787,13 +2515,13 @@ def gui2():
     Mut_type.place(x = 60 , y= 240) 
     Mut_type.current() 
 
-    Button( screen2 , text = 'Visualize Graph' , bg='White' , fg=  'Black'  , font = ('Helvitka' , 18 ,'bold') , command = lambda : show( screen2 ,  Cancer_type2 , lineages , Gen_start , Gen_end , Mut_type )  ).place(x = 290 , y = 240 )
+    Button( screen2 , text = 'Visualize Graph' , bg='White' , fg=  'Black'  , font = ('Helvitka' , 18 ,'bold') , command = lambda : show( screen2 ,  Cancer_type2 , Sim_type2 , Gen_start , Gen_end , Mut_type )  ).place(x = 290 , y = 240 )
 
     screen2.mainloop()
 
 
 
-def mut_catalog(cancer_type, lineage, gen_start, gen_end, mut_type):
+def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
     try:
         myapp = Tk()
         myapp.geometry('1600x900')
@@ -1806,11 +2534,26 @@ def mut_catalog(cancer_type, lineage, gen_start, gen_end, mut_type):
 
         if mut_type.lower() == "sbs":
             
-            graph_data = pd.read_csv(abs_path(cancer_type + '_Generation_' + str(gen_start) + '_Lineage_' + str(lineage) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
-
+            try:
+                graph_data = pd.read_csv(abs_path(cancer_type + '_Generation_1_Lineage_' + str(gen_start) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
+            except:
+                pass
+            try:
+                graph_data = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen_start) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
+            except:
+                pass
+            
             for gen in range(gen_start+1, gen_end+1):
-                df_read_in = pd.read_csv(abs_path(cancer_type + '_Generation_' + str(gen) + '_Lineage_' + str(lineage) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
-                graph_data['Frequency'] += df_read_in['Frequency']
+                try:
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_Generation_1_Lineage_' + str(gen) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
+                    graph_data['Frequency'] += df_read_in['Frequency']
+                except:
+                    pass
+                try:
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
+                    graph_data['Frequency'] += df_read_in['Frequency']
+                except:
+                    pass
                 
             graph_data['Frequency'] = graph_data['Frequency'].div(graph_data['Frequency'].sum())
             graph_data.sort_values(by=["Type","SubType"],inplace=True )
@@ -1875,13 +2618,26 @@ def mut_catalog(cancer_type, lineage, gen_start, gen_end, mut_type):
   
         if mut_type.lower() == "dbs":
             
-            graph_data = pd.read_csv(abs_path(cancer_type + '_Generation_' + str(gen_start) + '_Lineage_' + str(lineage) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
-
+            try:
+                graph_data = pd.read_csv(abs_path(cancer_type + '_Generation_1_Lineage_' + str(gen_start) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
+            except:
+                pass
+            try:
+                graph_data = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen_start) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
+            except:
+                pass
             for gen in range(gen_start+1, gen_end+1):
-                df_read_in = pd.read_csv(abs_path(cancer_type + '_Generation_' + str(gen) + '_Lineage_' + str(lineage) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
-                graph_data['Frequency'] += df_read_in['Frequency']
+                try:
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_Generation_1_Lineage_' + str(gen) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
+                    graph_data['Frequency'] += df_read_in['Frequency']
+                except:
+                    pass
+                try:
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen) + '_' + mut_type.lower() + '_freq_table.csv', 'File'))
+                    graph_data['Frequency'] += df_read_in['Frequency']
+                except:
+                    pass
                 
-            
             graph_data['Frequency'] = graph_data['Frequency'].div(graph_data['Frequency'].sum())
             graph_data.sort_values(by=["Mutation Type", "2mer_index"],inplace=True)
             
@@ -1970,12 +2726,26 @@ def mut_catalog(cancer_type, lineage, gen_start, gen_end, mut_type):
             canvas.get_tk_widget().pack( fill=BOTH, expand=True)
         
         if mut_type.lower() == "insertion":
-
-            graph_data = pd.read_csv(abs_path(cancer_type + '_Generation_' + str(gen_start) + '_Lineage_' + str(lineage) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
-
+            
+            try:
+                graph_data = pd.read_csv(abs_path(cancer_type + '_Generation_1_Lineage_' + str(gen_start) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
+            except:
+                pass
+            try:
+                graph_data = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen_start) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
+            except:
+                pass
             for gen in range(gen_start+1, gen_end+1):
-                df_read_in = pd.read_csv(abs_path(cancer_type + '_Generation_' + str(gen) + '_Lineage_' + str(lineage) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
-                graph_data['Frequency'] += df_read_in['Frequency']
+                try:
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_Generation_1_Lineage_' + str(gen) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
+                    graph_data['Frequency'] += df_read_in['Frequency']
+                except:
+                    pass
+                try:
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
+                    graph_data['Frequency'] += df_read_in['Frequency']
+                except:
+                    pass
                 
             graph_data['Frequency'] = graph_data['Frequency'].div(graph_data['Frequency'].sum())
             graph_data.sort_values(by=["Index", "Mutation Type"],inplace=True)
@@ -2024,11 +2794,25 @@ def mut_catalog(cancer_type, lineage, gen_start, gen_end, mut_type):
             
         if mut_type.lower() == "deletion":
             
-            graph_data = pd.read_csv(abs_path(cancer_type + '_Generation_' + str(gen_start) + '_Lineage_' + str(lineage) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
-
+            try:
+                graph_data = pd.read_csv(abs_path(cancer_type + '_Generation_1_Lineage_' + str(gen_start) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
+            except:
+                pass
+            try:
+                graph_data = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen_start) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
+            except:
+                pass
             for gen in range(gen_start+1, gen_end+1):
-                df_read_in = pd.read_csv(abs_path(cancer_type + '_Generation_' + str(gen) + '_Lineage_' + str(lineage) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
-                graph_data['Frequency'] += df_read_in['Frequency']
+                try:
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_Generation_1_Lineage_' + str(gen) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
+                    graph_data['Frequency'] += df_read_in['Frequency']
+                except:
+                    pass
+                try:
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen) + '_' + mut_type[:3].lower() + '_freq_table.csv', 'File'))
+                    graph_data['Frequency'] += df_read_in['Frequency']
+                except:
+                    pass
                 
             graph_data['Frequency'] = graph_data['Frequency'].div(graph_data['Frequency'].sum())
             graph_data.sort_values(by=["Index", "Mutation Type"],inplace=True)
@@ -2077,7 +2861,7 @@ def mut_catalog(cancer_type, lineage, gen_start, gen_end, mut_type):
 
         if mut_type.lower() not in ["sbs", "dbs", "insertion", "deletion"]:
             print("Choose a mutation type from sbs, dbs, insertion or deletion.")
-        print(  'MUT_CATALOG FUNCTION EXECUTED' )    
+        print(  'Visualization is loading...' )    
         
         myapp.mainloop()
     except Exception as e:
@@ -2089,7 +2873,7 @@ def show(root , *lis):
     if ag.count( '' ) > 0:
         messagebox.showinfo('Error' , 'Please enter all arguments for visualization. ' , parent= screen2)
     else:    
-        mut_catalog( ag[0] , int(ag[1]) , int(ag[2]) , int(ag[3]) , ag[-1] )
+        mut_catalog( ag[0] , ag[1] , int(ag[2]) , int(ag[3]) , ag[-1] )
 
 
 
@@ -2107,7 +2891,7 @@ class Main_window:
         Button(self.main , text = '  Simulation ' , bg= 'White' , fg = 'Black' , font = ('Helvitka' , 30) , command = self.func_1).place(x = 160 , y = 120 )
         Button(self.main , text = '  Visualization  ', bg = 'White' , fg = 'Black' , font = ('Helvitka' , 30) , command = self.func_2).place( x= 145, y = 220 )
 
-        Label(self.main , text  = 'Version 1.0 by David Chen' , fg = 'Black' , font =('verdana' , 10 )).place( x = 320 , y = 370 )
+        Label(self.main , text  = 'Version 2.0 by David Chen' , fg = 'Black' , font =('verdana' , 10 )).place( x = 320 , y = 370 )
                 
         self.main.mainloop()
 
@@ -2117,10 +2901,9 @@ class Main_window:
         gui2()        
 
 if __name__ ==  '__main__':
+    #Cell 8 Loaded
+    print("Cell 8 (Visualization) of 8 Loaded")
+    print("SomaticSiMu is set up.")
+    multiprocessing.set_start_method('spawn')
     obj = Main_window()
     
-#Cell 8 Loaded
-print("Cell 8 (Visualization) of 8 Loaded")
-print("SomaticSiMu is set up.")
-
-
