@@ -2493,7 +2493,7 @@ def gui2():
     Cancer_type2.current() 
 
     n5 = StringVar() 
-    Button(screen2 , text = 'Simulation_type',bg= 'White' , fg = 'Black'  , font = ('Helvitka' , 12 , 'bold' ) , command = lambda : open_img( screen2 , abs_path('simulation_type.png', "File" ))).place(x = 290 , y = 80)  
+    Button(screen2 , text = 'Visualization_type',bg= 'White' , fg = 'Black'  , font = ('Helvitka' , 12 , 'bold' ) , command = lambda : open_img( screen2 , abs_path('visualization_type.png', "File" ))).place(x = 290 , y = 80)  
     Sim_type2 = ttk.Combobox( screen2 , height = 12 , width = 14 ,textvariable = n5)
     Sim_type2['values'] = ( ['Early', 'Late' , 'End'] )  
     Sim_type2.place(x = 290 , y= 100) 
@@ -2907,3 +2907,13 @@ if __name__ ==  '__main__':
     multiprocessing.set_start_method('spawn')
     obj = Main_window()
     
+
+#for i in [5]:
+#    somatic_sim(cancer_type="Bladder-TCC", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+    
+#for i in [25]:
+#    somatic_sim(cancer_type="Head-SCC", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+
+#for i in [29, 37, 51, 66]:
+#    somatic_sim(cancer_type="Myeloid-MPN", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+
