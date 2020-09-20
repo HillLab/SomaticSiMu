@@ -2340,7 +2340,7 @@ def run( *lis):
         messagebox.showinfo('Window' , 'Please enter all arguments for simulation.' , parent= screen1)
     else:    
         starttime= time.time()
-        pool = multiprocessing.Pool(processes=4 )
+        pool = multiprocessing.Pool( 8)
         
         my_arg  = list ( product( [arg] ,  list( range( int(arg[ 0 ]) ) )  ) )
 
@@ -2511,7 +2511,7 @@ def gui2():
     n4 = StringVar() 
     Button(screen2 , text = 'Mut_type',bg= 'White' , fg = 'Black'  , font = ('Helvitka' , 12 , 'bold' ) , command = lambda : open_img( screen2 , abs_path('viz_mut_type.png', "File" ))).place(x = 60 , y = 220)  
     Mut_type = ttk.Combobox( screen2 , height = 12 , width = 14 ,textvariable = n4)
-    Mut_type['values'] = ( ['SBS', 'DBS' , 'Insertion' , 'Deletion'] )  
+    Mut_type['values'] = ( ['SBS', 'DBS' , 'Insertion' , 'Deletion', 'Mutation Burden'] )  
     Mut_type.place(x = 60 , y= 240) 
     Mut_type.current() 
 
@@ -2853,6 +2853,38 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
             
             ax.grid(axis = 'y', color=(0.785, 0.785, 0.785), linestyle='-', linewidth = 1)
             ax.set_axisbelow(True)
+            ax.xaxis.labelpad= 10
+            ax.yaxis.labelpad= 10
+
+            canvas = FigureCanvasTkAgg(fig , master=frame1)
+            canvas.get_tk_widget().pack(fill=BOTH, expand=True)
+
+
+        if mut_type.lower() == "mutation burden":
+           
+            mutation_burden = pd.DataFrame(index = range(gen_start, gen_end+1), columns = ['sbs', 'dbs', 'ins', 'del'])
+            
+            for gen in range(gen_start, gen_end+1):
+                try:
+                    sbs_burden = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen) + '_' + "sbs" + '_freq_table.csv', 'File'))['Frequency'].sum()
+                    dbs_burden = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen) + '_' + "dbs" + '_freq_table.csv', 'File'))['Frequency'].sum()
+                    ins_burden = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen) + '_' + "ins" + '_freq_table.csv', 'File'))['Frequency'].sum()
+                    del_burden = pd.read_csv(abs_path(cancer_type + '_' + str(simulation_type) + '_Stage_Lineage_' + str(gen) + '_' + "del" + '_freq_table.csv', 'File'))['Frequency'].sum()
+                
+                    mutation_burden.iloc[list(range(gen_start, gen_end+1)).index(gen), 0] = sbs_burden
+                    mutation_burden.iloc[list(range(gen_start, gen_end+1)).index(gen), 1] = dbs_burden
+                    mutation_burden.iloc[list(range(gen_start, gen_end+1)).index(gen), 2] = ins_burden
+                    mutation_burden.iloc[list(range(gen_start, gen_end+1)).index(gen), 3] = del_burden
+                    
+                except:
+                    pass
+                
+            fig, ax = plt.subplots(figsize=(10, 10))
+            ax = mutation_burden.plot.bar(stacked=True, color= ["#FF0033", "#0066FF","#00CC33", "#FFCC66"], figsize=(10,7))
+            ax.set_ylim(mutation_burden.min().sum() - 0.2*mutation_burden.max().sum() - (mutation_burden.min().sum() - 0.1*mutation_burden.max().sum())%10,mutation_burden.max().sum() + 0.1*mutation_burden.max().sum()+10 - (mutation_burden.max().sum() + 0.2*mutation_burden.max().sum())%10)
+            ax.tick_params(axis='x', rotation=0)
+            ax.set_xlabel("Sequence ID")
+            ax.set_ylabel("Simulated Mutation Burden")
             ax.xaxis.labelpad= 10
             ax.yaxis.labelpad= 10
 
