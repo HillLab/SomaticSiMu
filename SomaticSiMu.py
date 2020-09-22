@@ -799,6 +799,23 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
         
         #Count of each kmer
         sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
+        
+        #Normalization of mutation probabilities to whole genome burden
+        kmer_ref = (glob.glob("/Users/davidchen/Documents/GitHub/SomaticSiMu/kmer_ref_count/6-mer/6-mer_chr*"))
+        kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
+        for i in kmer_ref[1:-1]:
+            sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
+            kmer_count = kmer_count + sample
+            
+        kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
+        
+        sample_expected_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
+        for key in sample_expected_count_dict:
+            sample_expected_count_dict[key] = sample_expected_count_dict[key] * (len(sample_seq) / sum(list(kmer_count_dict.values()))) 
+        
+        normalize_constant = {k: float(sample_count_dict[k])/sample_expected_count_dict[k] for k in sample_count_dict}
+        normalized_sample_count_dict = {k: int(sample_count_dict[k]/normalize_constant[k]) for k in sample_count_dict}
+
        
         print('Simulating Tumour Stage End of Lineage ' + str(number_of_lineages))
     
@@ -885,7 +902,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             
             else:
                 temp_i_prob = [insertion_df.loc[insertion_df['Size'] == count].loc[keys[:count],'total_prob']] 
-                insertion_count = np.random.binomial(sample_count_dict[keys], temp_i_prob, 1) 
+                insertion_count = np.random.binomial(normalized_sample_count_dict[keys], temp_i_prob, 1) 
             
                 for m in range(sum(i_number > 0 for i_number in list(insertion_count))):
                     insertion_index = np.random.choice(sample_index_dict[keys])
@@ -900,7 +917,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             
             else:
                 temp_d_prob = [deletion_df.loc[deletion_df['Size'] == count].loc[keys[:count],'total_prob']] 
-                deletion_count = np.random.binomial(sample_count_dict[keys], temp_d_prob, 1)  
+                deletion_count = np.random.binomial(normalized_sample_count_dict[keys], temp_d_prob, 1)  
             
                 for n in range(sum(d_number > 0 for d_number in list(deletion_count))):
                     deletion_index = np.random.choice(sample_index_dict[keys])
@@ -915,7 +932,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             else:
                 sbs_types = list(sbs_sorted_df.loc[keys[:3],'Type']) + [None]
                 sbs_prob = list(sbs_sorted_df.loc[keys[:3],'total_prob'])+ [1- sum(list(sbs_sorted_df.loc[keys[:3],'total_prob']))]             
-                sbs = [sbs_num for sbs_num in list(np.random.choice(sbs_types,p=sbs_prob, size = sample_count_dict[keys])) if sbs_num]
+                sbs = [sbs_num for sbs_num in list(np.random.choice(sbs_types,p=sbs_prob, size = normalized_sample_count_dict[keys])) if sbs_num]
                 for sbs_value in sbs:
                     single_base_index = np.random.choice(sample_index_dict[keys])
                     sbs_dict[single_base_index] = sbs_value[2]
@@ -926,7 +943,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             if keys[:2] in dbs_sorted_df.index:
                 dbs_types = list(dbs_sorted_df.loc[keys[:2],'Mutation Type']) + [None]     
                 dbs_prob = list(dbs_sorted_df.loc[keys[:2],'total_prob'])+ [1- sum(list(dbs_sorted_df.loc[keys[:2],'total_prob']))]
-                dbs = [dbs_num for dbs_num in list(np.random.choice(dbs_types,p=dbs_prob, size = sample_count_dict[keys])) if dbs_num]
+                dbs = [dbs_num for dbs_num in list(np.random.choice(dbs_types,p=dbs_prob, size = normalized_sample_count_dict[keys])) if dbs_num]
                 for dbs_value in dbs:
                     double_base_index = np.random.choice(sample_index_dict[keys])
                     dbs_dict[double_base_index] = dbs_value[3:]
@@ -1561,6 +1578,23 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             #Count of each kmer
             sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
            
+            #Normalization of mutation probabilities to whole genome burden
+            kmer_ref = (glob.glob("/Users/davidchen/Documents/GitHub/SomaticSiMu/kmer_ref_count/6-mer/6-mer_chr*"))
+            kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
+            for i in kmer_ref[1:-1]:
+                sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
+                kmer_count = kmer_count + sample
+                
+            kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
+            
+            sample_expected_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
+            for key in sample_expected_count_dict:
+                sample_expected_count_dict[key] = sample_expected_count_dict[key] * (len(sample_seq) / sum(list(kmer_count_dict.values()))) 
+            
+            normalize_constant = {k: float(sample_count_dict[k])/sample_expected_count_dict[k] for k in sample_count_dict}
+            normalized_sample_count_dict = {k: int(sample_count_dict[k]/normalize_constant[k]) for k in sample_count_dict}
+
+       
             print('Simulating Tumour Stage ' + str(i)+ ' of Lineage ' + str(number_of_lineages))
         
             #Types of mutations for a specific generation  of a specific lineage
@@ -1651,7 +1685,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
                 
                 else:
                     temp_i_prob = [insertion_df.loc[insertion_df['Size'] == count].loc[keys[:count],'total_prob']] 
-                    insertion_count = np.random.binomial(sample_count_dict[keys], temp_i_prob, 1) 
+                    insertion_count = np.random.binomial(normalized_sample_count_dict[keys], temp_i_prob, 1) 
                 
                     for m in range(sum(i_number > 0 for i_number in list(insertion_count))):
                         insertion_index = np.random.choice(sample_index_dict[keys])
@@ -1666,7 +1700,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
                 
                 else:
                     temp_d_prob = [deletion_df.loc[deletion_df['Size'] == count].loc[keys[:count],'total_prob']] 
-                    deletion_count = np.random.binomial(sample_count_dict[keys], temp_d_prob, 1)  
+                    deletion_count = np.random.binomial(normalized_sample_count_dict[keys], temp_d_prob, 1)  
                 
                     for n in range(sum(d_number > 0 for d_number in list(deletion_count))):
                         deletion_index = np.random.choice(sample_index_dict[keys])
@@ -1681,7 +1715,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
                 else:
                     sbs_types = list(sbs_sorted_df.loc[keys[:3],'Type']) + [None]
                     sbs_prob = list(sbs_sorted_df.loc[keys[:3],'total_prob'])+ [1- sum(list(sbs_sorted_df.loc[keys[:3],'total_prob']))]             
-                    sbs = [sbs_num for sbs_num in list(np.random.choice(sbs_types,p=sbs_prob, size = sample_count_dict[keys])) if sbs_num]
+                    sbs = [sbs_num for sbs_num in list(np.random.choice(sbs_types,p=sbs_prob, size = normalized_sample_count_dict[keys])) if sbs_num]
                     for sbs_value in sbs:
                         single_base_index = np.random.choice(sample_index_dict[keys])
                         sbs_dict[single_base_index] = sbs_value[2]
@@ -1692,7 +1726,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
                 if keys[:2] in dbs_sorted_df.index:
                     dbs_types = list(dbs_sorted_df.loc[keys[:2],'Mutation Type']) + [None]     
                     dbs_prob = list(dbs_sorted_df.loc[keys[:2],'total_prob'])+ [1- sum(list(dbs_sorted_df.loc[keys[:2],'total_prob']))]
-                    dbs = [dbs_num for dbs_num in list(np.random.choice(dbs_types,p=dbs_prob, size = sample_count_dict[keys])) if dbs_num]
+                    dbs = [dbs_num for dbs_num in list(np.random.choice(dbs_types,p=dbs_prob, size = normalized_sample_count_dict[keys])) if dbs_num]
                     for dbs_value in dbs:
                         double_base_index = np.random.choice(sample_index_dict[keys])
                         dbs_dict[double_base_index] = dbs_value[3:]
@@ -2943,9 +2977,3 @@ if __name__ ==  '__main__':
 #for i in [5]:
 #    somatic_sim(cancer_type="Bladder-TCC", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
     
-#for i in [25]:
-#    somatic_sim(cancer_type="Head-SCC", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
-
-#for i in [29, 37, 51, 66]:
-#    somatic_sim(cancer_type="Myeloid-MPN", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
-
