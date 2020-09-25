@@ -704,7 +704,7 @@ print("Cell 5 of 8 Loaded")
 
 #%%
 def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, simulation_type, sequence_abs_path, slice_start, slice_end,power=1, syn_rate=1, non_syn_rate=1):
-    global count_progress
+ 
     #INPUT CHECKS
     if reading_frame not in [1, 2, 3]:
         print("reading_frame argument must be 1, 2, or 3.")
@@ -811,12 +811,12 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
         
         sample_expected_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
         for key in sample_expected_count_dict:
-            sample_expected_count_dict[key] = sample_expected_count_dict[key] * (len(sample_seq) / sum(list(kmer_count_dict.values()))) 
+            sample_expected_count_dict[key] = sample_expected_count_dict[key] * (len(sample_seq) / sum(list( kmer_reference_count_dict.values()))) 
+        
         
         normalize_constant = {k: float(sample_count_dict[k])/sample_expected_count_dict[k] for k in sample_count_dict}
         normalized_sample_count_dict = {k: int(sample_count_dict[k]/normalize_constant[k]) for k in sample_count_dict}
 
-       
         print('Simulating Tumour Stage End of Lineage ' + str(number_of_lineages))
     
         #Types of mutations for a specific generation  of a specific lineage
@@ -2344,6 +2344,7 @@ def multiprocessing_func( p ):
     number_of_lineages = p[-1]
 
     try:
+        
         somatic_sim(cancer_type = arg[1] , 
                 reading_frame = int(arg[2]) , 
                 std_outlier = int(arg[3]) , 
@@ -2372,7 +2373,8 @@ def run( *lis):
     print(arg)
     if arg.count('') > 0:
         messagebox.showinfo('Window' , 'Please enter all arguments for simulation.' , parent= screen1)
-    else:    
+    else:          
+        
         starttime= time.time()
         pool = multiprocessing.Pool( 8)
         
@@ -2913,17 +2915,18 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 except:
                     pass
                 
-            fig, ax = plt.subplots(figsize=(10, 10))
-            ax = mutation_burden.plot.bar(stacked=True, color= ["#FF0033", "#0066FF","#00CC33", "#FFCC66"], figsize=(10,7))
-            ax.set_ylim(mutation_burden.min().sum() - 0.2*mutation_burden.max().sum() - (mutation_burden.min().sum() - 0.1*mutation_burden.max().sum())%10,mutation_burden.max().sum() + 0.1*mutation_burden.max().sum()+10 - (mutation_burden.max().sum() + 0.2*mutation_burden.max().sum())%10)
+            plt.style.use('seaborn-whitegrid')
+            #fig, ax = plt.subplots(figsize=(10, 10))
+            ax = mutation_burden.plot.bar(stacked=True, color= ["#E74C3C", "#3498DB","#27AE60", "#9B59B6"], figsize=(10,7))
+            ax.set_ylim(mutation_burden.min().sum() - 0.2*mutation_burden.max().sum() - (mutation_burden.min().sum() - 0.1*mutation_burden.max().sum())%10, mutation_burden.max().sum() + 0.15*mutation_burden.max().sum()+10 - (mutation_burden.max().sum() + 0.2*mutation_burden.max().sum())%10)
             ax.tick_params(axis='x', rotation=0)
             ax.set_xlabel("Sequence ID")
-            ax.set_ylabel("Simulated Mutation Burden")
+            ax.set_ylabel("Number of simulated mutations")
             ax.xaxis.labelpad= 10
             ax.yaxis.labelpad= 10
 
-            canvas = FigureCanvasTkAgg(fig , master=frame1)
-            canvas.get_tk_widget().pack(fill=BOTH, expand=True)
+            #canvas = FigureCanvasTkAgg(fig , master=frame1)
+            #canvas.get_tk_widget().pack(fill=BOTH, expand=True)
 
         if mut_type.lower() not in ["sbs", "dbs", "insertion", "deletion"]:
             print("Choose a mutation type from sbs, dbs, insertion or deletion.")
