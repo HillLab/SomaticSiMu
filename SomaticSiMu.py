@@ -757,6 +757,8 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
     #Output directory paths for mutated sequence and SBS, DBS, Insertion and Deletion frequency matrices
     seq_directory = abs_path("Sample", "Directory")
     mut_mat_directory = abs_path("Frequency_Table", "Directory")
+    mut_metadata_directory = abs_path("Mutation_Metadata", "Directory")
+    
     
     #Setup probabilities into processed dataframes
     print('Lineage ' + str(number_of_lineages))
@@ -1501,6 +1503,34 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             row = del_mut_freq[(del_mut_freq['Index'] == deletion_count)].index
             del_mut_freq.iloc[row[0], 4] += 1
             
+            
+        #SBS Metadata
+        sbs_mut_metadata = pd.DataFrame(index = range(len(output_sbs_dict)), columns = ["SubType", "Type", "Index"])
+        for mutation in range(len(output_sbs_dict)):
+            sbs_mut_metadata.loc[mutation, "SubType"] = list(output_sbs_dict.values())[mutation][1]
+            sbs_mut_metadata.loc[mutation, "Type"] = list(output_sbs_dict.values())[mutation][0]
+            sbs_mut_metadata.loc[mutation, "Index"] = list(output_sbs_dict.keys())[mutation]
+            
+        #DBS Metadata
+        dbs_mut_metadata = pd.DataFrame(index = range(len(output_dbs_dict)), columns = ["2-mer Index", "Type", "Index"])
+        for mutation in range(len(output_sbs_dict)):
+            dbs_mut_metadata.loc[mutation, "2-mer Index"] = list(output_dbs_dict.values())[mutation][:2]
+            dbs_mut_metadata.loc[mutation, "Type"] = list(output_dbs_dict.values())[mutation]
+            dbs_mut_metadata.loc[mutation, "Index"] = list(output_dbs_dict.keys())[mutation]
+            
+        #Insertion Metadata
+        ins_mut_metadata = pd.DataFrame(index = range(len(insertion_dict)), columns = ["Type", "Index"])
+        for mutation in range(len(insertion_dict)):
+            ins_mut_metadata.loc[mutation, "Type"] = list(insertion_dict.values())[mutation]
+            ins_mut_metadata.loc[mutation, "Index"] = list(insertion_dict.keys())[mutation]
+                    
+        #Deletion Metadata
+        del_mut_metadata = pd.DataFrame(index = range(len(deletion_dict)), columns = ["Type", "Index"])
+        for mutation in range(len(deletions_dict)):
+            del_mut_metadata.loc[mutation, "Type"] = list(deletion_dict.values())[mutation]
+            del_mut_metadata.loc[mutation, "Index"] = list(deletion_dict.keys())[mutation]
+            
+            
         #Apply the mutations linearly 
         for index_sbs in list(sbs_dict.keys()):
             sample_seq = sample_seq[:index_sbs] + sbs_dict[index_sbs] + sample_seq[index_sbs+1:]
@@ -1545,6 +1575,28 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
         deletion_freq_path = mut_mat_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_del_freq_table.csv'
         with open(deletion_freq_path, 'w+'):
             del_mut_freq.to_csv(deletion_freq_path, index=False)
+            
+        
+        
+        #Write SBS mutation frequency tables to csv file
+        sbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_index_table.csv'
+        with open(sbs_freq_path, 'w+'):
+            sbs_mut_metadata.to_csv(sbs_metadata_path, index=False)
+            
+        #Write DBS mutation frequency tables to csv file
+        dbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_dbs_index_table.csv'
+        with open(dbs_freq_path, 'w+'):
+            dbs_mut_metadata.to_csv(dbs_metadata_path, index=False)
+          
+        #Write Insertion mutation frequency tables to csv file
+        insertion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_ins_index_table.csv'
+        with open(insertion_freq_path, 'w+'):
+            ins_mut_metadata.to_csv(insertion_metadata_path, index=False)
+            
+        #Write Deletion mutation frequency tables to csv file
+        deletion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_del_index_table.csv'
+        with open(deletion_freq_path, 'w+'):
+            del_mut_metadata.to_csv(deletion_metadata_path, index=False)
     
     if simulation_type == "temporal":
         
@@ -2977,6 +3029,6 @@ if __name__ ==  '__main__':
     obj = Main_window()
     
 
-#for i in [5]:
-#    somatic_sim(cancer_type="Bladder-TCC", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+for i in [300, 345]:
+    somatic_sim(cancer_type="Biliary-AdenoCA", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
     
