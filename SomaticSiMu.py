@@ -2933,17 +2933,29 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                         per_5.append(graph_data.iloc[counter, :-2].mean(axis=0) - i)
                     counter += 1
 
-            fig = plt.figure(figsize=(50, 10))
-            ax = fig.add_subplot(111)
-            
-            ind = np.arange(12)   
-            
-            color_list = [(0.949, 0.753, 0.478), 
-                          (0.937, 0.512, 0.2)]
-            
-            p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]))
-            p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]))
-            
+                fig = plt.figure(figsize=(50, 10))
+                ax = fig.add_subplot(111)
+                
+                ind = np.arange(12)   
+                
+                color_list = [(0.949, 0.753, 0.478), 
+                              (0.937, 0.512, 0.2)]
+                
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]))
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]))
+                
+            else:
+                fig = plt.figure(figsize=(50, 10))
+                ax = fig.add_subplot(111)
+                
+                ind = np.arange(12)   
+                
+                color_list = [(0.949, 0.753, 0.478), 
+                              (0.937, 0.512, 0.2)]
+                
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0])
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1])
+                
                
             y_limit = ax.get_ylim()[1]
             
@@ -3018,17 +3030,29 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                         per_5.append(graph_data.iloc[counter, :-2].mean(axis=0) - i)
                     counter += 1
             
-            fig = plt.figure(figsize=(50, 10))
-            ax = fig.add_subplot(111)
+                fig = plt.figure(figsize=(50, 10))
+                ax = fig.add_subplot(111)
             
-            ind = np.arange(12)   
+                ind = np.arange(12)   
             
-            color_list = [(0.727, 0.855, 0.569), 
+                color_list = [(0.727, 0.855, 0.569), 
                           (0.345, 0.612, 0.247)]
             
-            p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]))
-            p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]))
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]))
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]))
+                
+            else:
+                fig = plt.figure(figsize=(50, 10))
+                ax = fig.add_subplot(111)
             
+                ind = np.arange(12)   
+            
+                color_list = [(0.727, 0.855, 0.569), 
+                          (0.345, 0.612, 0.247)]
+            
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0])
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1])
+                
                
             y_limit = ax.get_ylim()[1]
             
