@@ -758,6 +758,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
     seq_directory = abs_path("Sample", "Directory")
     mut_mat_directory = abs_path("Frequency_Table", "Directory")
     mut_metadata_directory = abs_path("Mutation_Metadata", "Directory")
+    mut_sigs_directory = abs_path("Signature_Combinations", "Directory")
     
     
     #Setup probabilities into processed dataframes
@@ -1549,12 +1550,16 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             sample_seq = sample_seq[:int(index_deletion) + offset_index] + sample_seq[int(index_deletion) + 1 + offset_index:]
             offset_index -= 1
       
+        
+      
         #Write mutated sequence to fasta file
         sample_sequence_file = seq_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages) + '.fasta'
         with open(sample_sequence_file, 'w+') as fasta_file:
             fasta_file.write(">" + str(cancer_type) + "_Lineage_" + str(number_of_lineages) + "_end_stage \n")
             fasta_file.write("")
             fasta_file.write(sample_seq)
+            
+            
             
         #Write SBS mutation frequency tables to csv file
         sbs_freq_path = mut_mat_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_freq_table.csv'
@@ -1578,25 +1583,44 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             
         
         
-        #Write SBS mutation frequency tables to csv file
+        #Write SBS mutation index tables to csv file
         sbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_index_table.csv'
         with open(sbs_freq_path, 'w+'):
             sbs_mut_metadata.to_csv(sbs_metadata_path, index=False)
             
-        #Write DBS mutation frequency tables to csv file
+        #Write DBS mutation index tables to csv file
         dbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_dbs_index_table.csv'
         with open(dbs_freq_path, 'w+'):
             dbs_mut_metadata.to_csv(dbs_metadata_path, index=False)
           
-        #Write Insertion mutation frequency tables to csv file
+        #Write Insertion mutation index tables to csv file
         insertion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_ins_index_table.csv'
         with open(insertion_freq_path, 'w+'):
             ins_mut_metadata.to_csv(insertion_metadata_path, index=False)
             
-        #Write Deletion mutation frequency tables to csv file
+        #Write Deletion mutation index tables to csv file
         deletion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_del_index_table.csv'
         with open(deletion_freq_path, 'w+'):
             del_mut_metadata.to_csv(deletion_metadata_path, index=False)
+            
+            
+            
+        #SBS signatures simulated
+        sbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_sbs_sigs.txt'
+        with open(sbs_sigs_path , 'a+') as outfile:
+            outfile.write('\n'.join(sbs_sig_combination[0].tolist()) + '\n')
+        
+        #DBS signatures simulated
+        dbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_dbs_sigs.txt'
+        with open(dbs_sigs_path , 'a+') as outfile:
+            outfile.write('\n'.join(dbs_sig_combination[0].tolist()) + '\n')
+            
+        #ID signatures simulated
+        id_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_id_sigs.txt'
+        with open(id_sigs_path , 'a+') as outfile:
+            outfile.write('\n'.join(id_sig_combination[0].tolist()) + '\n')
+            
+            
     
     if simulation_type == "temporal":
         
@@ -2355,6 +2379,8 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
                 fasta_file.write("")
                 fasta_file.write(sample_seq)
                 
+                
+                
             #Write SBS mutation frequency tables to csv file
             sbs_freq_path = mut_mat_directory + "/" + cancer_type + '_'+ str(i) + '_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_freq_table.csv'
             with open(sbs_freq_path, 'w+'):
@@ -2374,7 +2400,46 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             deletion_freq_path = mut_mat_directory + "/" + cancer_type + '_'+ str(i) + '_Stage_Lineage_' + str(number_of_lineages)+ '_del_freq_table.csv'
             with open(deletion_freq_path, 'w+'):
                 del_mut_freq.to_csv(deletion_freq_path, index=False)
+                
+                
+                
+            #Write SBS mutation index tables to csv file
+            sbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_index_table.csv'
+            with open(sbs_freq_path, 'w+'):
+                sbs_mut_metadata.to_csv(sbs_metadata_path, index=False)
+                
+            #Write DBS mutation index tables to csv file
+            dbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_dbs_index_table.csv'
+            with open(dbs_freq_path, 'w+'):
+                dbs_mut_metadata.to_csv(dbs_metadata_path, index=False)
+              
+            #Write Insertion mutation index tables to csv file
+            insertion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_ins_index_table.csv'
+            with open(insertion_freq_path, 'w+'):
+                ins_mut_metadata.to_csv(insertion_metadata_path, index=False)
+                
+            #Write Deletion mutation index tables to csv file
+            deletion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_del_index_table.csv'
+            with open(deletion_freq_path, 'w+'):
+                del_mut_metadata.to_csv(deletion_metadata_path, index=False)
+                
+                
+                
+            #SBS signatures simulated
+            sbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_sbs_sigs.txt'
+            with open(sbs_sigs_path , 'a+') as outfile:
+                outfile.write('\n'.join(sbs_sig_combination[0].tolist()) + '\n')
             
+            #DBS signatures simulated
+            dbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_dbs_sigs.txt'
+            with open(dbs_sigs_path , 'a+') as outfile:
+                outfile.write('\n'.join(dbs_sig_combination[0].tolist()) + '\n')
+                
+            #ID signatures simulated
+            id_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_id_sigs.txt'
+            with open(id_sigs_path , 'a+') as outfile:
+                outfile.write('\n'.join(id_sig_combination[0].tolist()) + '\n')
+                
         
 #Cell 6 Loaded
 print("Cell 6 (SomaticSiMu) of 8 Loaded")
@@ -2427,7 +2492,7 @@ def run( *lis):
     else:          
         
         starttime= time.time()
-        pool = multiprocessing.Pool( 8)
+        pool = multiprocessing.Pool(8)
         
         my_arg  = list ( product( [arg] ,  list( range( int(arg[ 0 ]) ) )  ) )
 
@@ -2665,16 +2730,14 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 
                 color_list = [(0.416, 0.733, 0.918), (0,0,0), (0.765, 0.172, 0.157), (0.785, 0.785, 0.785), (0.678, 0.808, 0.412), (0.878, 0.773, 0.769)]
                 
-                p1 = ax.bar(range(0,16), graph_data.iloc[0:16, :-2].mean(axis=1), bottom=0, color = color_list[0], yerr = (per_5[0:16], per_95[0:16]))
-                p2 = ax.bar(range(16,32), graph_data.iloc[16:32, :-2].mean(axis=1), bottom=0, color = color_list[1], yerr = (per_5[16:32], per_95[16:32]))
-                p3 = ax.bar(range(32,48), graph_data.iloc[32:48, :-2].mean(axis=1), bottom=0, color = color_list[2], yerr = (per_5[32:48], per_95[32:48]))
-                p4 = ax.bar(range(48,64), graph_data.iloc[48:64, :-2].mean(axis=1), bottom=0, color = color_list[3], yerr = (per_5[48:64], per_95[48:64]))
-                p5 = ax.bar(range(64,80), graph_data.iloc[64:80, :-2].mean(axis=1), bottom=0, color = color_list[4], yerr = (per_5[64:80], per_95[64:80]))
-                p6 = ax.bar(range(80,96), graph_data.iloc[80:96, :-2].mean(axis=1), bottom=0, color = color_list[5], yerr = (per_5[80:96], per_95[80:96]))
+                p1 = ax.bar(range(0,16), graph_data.iloc[0:16, :-2].mean(axis=1), bottom=0, color = color_list[0], yerr = (per_5[0:16], per_95[0:16]),capsize=5)
+                p2 = ax.bar(range(16,32), graph_data.iloc[16:32, :-2].mean(axis=1), bottom=0, color = color_list[1], yerr = (per_5[16:32], per_95[16:32]),capsize=5)
+                p3 = ax.bar(range(32,48), graph_data.iloc[32:48, :-2].mean(axis=1), bottom=0, color = color_list[2], yerr = (per_5[32:48], per_95[32:48]),capsize=5)
+                p4 = ax.bar(range(48,64), graph_data.iloc[48:64, :-2].mean(axis=1), bottom=0, color = color_list[3], yerr = (per_5[48:64], per_95[48:64]),capsize=5)
+                p5 = ax.bar(range(64,80), graph_data.iloc[64:80, :-2].mean(axis=1), bottom=0, color = color_list[4], yerr = (per_5[64:80], per_95[64:80]),capsize=5)
+                p6 = ax.bar(range(80,96), graph_data.iloc[80:96, :-2].mean(axis=1), bottom=0, color = color_list[5], yerr = (per_5[80:96], per_95[80:96]),capsize=5)
                   
             else:
-                upper_error = [graph_data.iloc[mut,:-2].quantile(0.95) for mut in range(96)]
-                lower_error = [graph_data.iloc[mut,:-2].quantile(0.05) for mut in range(96)]
             
                 fig = plt.figure(figsize=(50, 10))
                 ax = fig.add_subplot(111)
@@ -2794,16 +2857,16 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                               (0.737, 0.588, 0.984),
                               (0.263, 0.0118, 0.584)]
                 
-                p1 = ax.bar(range(0,9), graph_data.iloc[0:9, :-2].mean(axis=1), bottom=0, color = color_list[0], yerr = (per_5[0:9], per_95[0:9]))
-                p2 = ax.bar(range(9,15), graph_data.iloc[9:15, :-2].mean(axis=1), bottom=0, color = color_list[1], yerr = (per_5[9:15], per_95[9:15]))
-                p3 = ax.bar(range(15,24), graph_data.iloc[15:24, :-2].mean(axis=1), bottom=0, color = color_list[2], yerr = (per_5[15:24], per_95[15:24]))
-                p4 = ax.bar(range(24,30), graph_data.iloc[24:30, :-2].mean(axis=1), bottom=0, color = color_list[3], yerr = (per_5[24:30], per_95[24:30]))
-                p5 = ax.bar(range(30,39), graph_data.iloc[30:39, :-2].mean(axis=1), bottom=0, color = color_list[4], yerr = (per_5[30:39], per_95[30:39]))
-                p6 = ax.bar(range(39,45), graph_data.iloc[39:45, :-2].mean(axis=1), bottom=0, color = color_list[5], yerr = (per_5[39:45], per_95[39:45]))
-                p7 = ax.bar(range(45,51), graph_data.iloc[45:51, :-2].mean(axis=1), bottom=0, color = color_list[6], yerr = (per_5[45:51], per_95[45:51]))
-                p8 = ax.bar(range(51,60), graph_data.iloc[51:60, :-2].mean(axis=1), bottom=0, color = color_list[7], yerr = (per_5[51:60], per_95[51:60]))
-                p9 = ax.bar(range(60,69), graph_data.iloc[60:69, :-2].mean(axis=1), bottom=0, color = color_list[8], yerr = (per_5[60:69], per_95[60:69]))
-                p10 = ax.bar(range(69,78), graph_data.iloc[69:78, :-2].mean(axis=1), bottom=0, color = color_list[9], yerr = (per_5[69:78], per_95[69:78]))
+                p1 = ax.bar(range(0,9), graph_data.iloc[0:9, :-2].mean(axis=1), bottom=0, color = color_list[0], yerr = (per_5[0:9], per_95[0:9]),capsize=5)
+                p2 = ax.bar(range(9,15), graph_data.iloc[9:15, :-2].mean(axis=1), bottom=0, color = color_list[1], yerr = (per_5[9:15], per_95[9:15]),capsize=5)
+                p3 = ax.bar(range(15,24), graph_data.iloc[15:24, :-2].mean(axis=1), bottom=0, color = color_list[2], yerr = (per_5[15:24], per_95[15:24]),capsize=5)
+                p4 = ax.bar(range(24,30), graph_data.iloc[24:30, :-2].mean(axis=1), bottom=0, color = color_list[3], yerr = (per_5[24:30], per_95[24:30]),capsize=5)
+                p5 = ax.bar(range(30,39), graph_data.iloc[30:39, :-2].mean(axis=1), bottom=0, color = color_list[4], yerr = (per_5[30:39], per_95[30:39]),capsize=5)
+                p6 = ax.bar(range(39,45), graph_data.iloc[39:45, :-2].mean(axis=1), bottom=0, color = color_list[5], yerr = (per_5[39:45], per_95[39:45]),capsize=5)
+                p7 = ax.bar(range(45,51), graph_data.iloc[45:51, :-2].mean(axis=1), bottom=0, color = color_list[6], yerr = (per_5[45:51], per_95[45:51]),capsize=5)
+                p8 = ax.bar(range(51,60), graph_data.iloc[51:60, :-2].mean(axis=1), bottom=0, color = color_list[7], yerr = (per_5[51:60], per_95[51:60]),capsize=5)
+                p9 = ax.bar(range(60,69), graph_data.iloc[60:69, :-2].mean(axis=1), bottom=0, color = color_list[8], yerr = (per_5[60:69], per_95[60:69]),capsize=5)
+                p10 = ax.bar(range(69,78), graph_data.iloc[69:78, :-2].mean(axis=1), bottom=0, color = color_list[9], yerr = (per_5[69:78], per_95[69:78]),capsize=5)
                 
             else:
                 fig = plt.figure(figsize=(50, 10))
@@ -2941,8 +3004,8 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 color_list = [(0.949, 0.753, 0.478), 
                               (0.937, 0.512, 0.2)]
                 
-                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]))
-                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]))
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]),capsize=5)
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]),capsize=5)
                 
             else:
                 fig = plt.figure(figsize=(50, 10))
@@ -3038,8 +3101,8 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 color_list = [(0.727, 0.855, 0.569), 
                           (0.345, 0.612, 0.247)]
             
-                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]))
-                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]))
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]),capsize=5)
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]),capsize=5)
                 
             else:
                 fig = plt.figure(figsize=(50, 10))
@@ -3166,6 +3229,6 @@ if __name__ ==  '__main__':
     obj = Main_window()
     
 
-for i in [300, 345]:
-    somatic_sim(cancer_type="Biliary-AdenoCA", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+#for i in [300, 345]:
+#    somatic_sim(cancer_type="Biliary-AdenoCA", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
     
