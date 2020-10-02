@@ -13,7 +13,7 @@ cd /Users/davidchen/Documents/GitHub/SomaticSiMu
 python SomaticSiMu_GUI.py
 
 Input Simulation Parameters: 
-cancer_type = "Biliary-AdenoCA
+cancer_type = Biliary-AdenoCA
 reading_frame = 1
 std_outlier = 3
 number_of_lineages = 100
