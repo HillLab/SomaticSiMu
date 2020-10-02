@@ -2491,7 +2491,7 @@ def main():
     std_outlier = 3  
     simulation_type = "end" 
     sequence_abs_path = input_file_path  
-    slice_start = 1  
+    slice_start = 0  
     slice_end = 50818467  
     power = 1  
     syn_rate = 1  
@@ -2507,8 +2507,6 @@ def main():
 
 if __name__ ==  '__main__':
     #Cell 8 Loaded
-    #print("SomaticSiMu is set up.")
-    #multiprocessing.set_start_method('spawn')
     main()
     #Cell 7 Loaded
 
