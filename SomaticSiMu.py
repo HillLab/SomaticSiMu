@@ -2483,7 +2483,7 @@ from functools import partial
 def main(): 
 
     iterable = range(0, 10)
-    pool = multiprocessing.Pool(2)
+    pool = multiprocessing.Pool()
     #starttime= time.time()
     
     cancer_type = "Skin-Melanoma" 

@@ -2518,7 +2518,7 @@ def run( *lis):
     else:          
         
         starttime= time.time()
-        pool = multiprocessing.Pool(8)
+        pool = multiprocessing.Pool()
         
         my_arg  = list ( product( [arg] ,  list( range( int(arg[ 0 ]) ) )  ) )
 
