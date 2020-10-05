@@ -2644,7 +2644,6 @@ print("Cell 7 (Simulation) of 8 Loaded")
 #%%
 
 
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.patches as patches
@@ -3194,19 +3193,39 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                     pass
                 
             plt.style.use('seaborn-whitegrid')
-            #fig, ax = plt.subplots(figsize=(10, 10))
-            ax = mutation_burden.plot.bar(stacked=True, color= ["#E74C3C", "#3498DB","#27AE60", "#9B59B6"], figsize=(10,7))
-            ax.set_ylim(mutation_burden.min().sum() - 0.2*mutation_burden.max().sum() - (mutation_burden.min().sum() - 0.1*mutation_burden.max().sum())%10, mutation_burden.max().sum() + 0.15*mutation_burden.max().sum()+10 - (mutation_burden.max().sum() + 0.2*mutation_burden.max().sum())%10)
-            ax.tick_params(axis='x', rotation=0)
-            ax.set_xlabel("Sequence ID")
-            ax.set_ylabel("Number of simulated mutations")
-            ax.xaxis.labelpad= 10
-            ax.yaxis.labelpad= 10
+            fig, ax = plt.subplots(1, 2, figsize=(gen_end/5, 5), sharey=True, gridspec_kw={'width_ratios': [10, 1]})
+            fig.tight_layout()
+            X = np.arange(gen_start, gen_end+1)
+            
+            ax[0].bar(X, mutation_burden['sbs'], color="#E74C3C")
+            ax[0].bar(X, mutation_burden['dbs'], bottom=mutation_burden['sbs'], color = "#3498DB")
+            ax[0].bar(X, mutation_burden['ins'], bottom=mutation_burden['dbs'] + mutation_burden['sbs'], color="#27AE60")
+            ax[0].bar(X, mutation_burden['del'], bottom=mutation_burden['dbs'] + mutation_burden['sbs'] + mutation_burden['ins'], color="#9B59B6")
+            ax[1].boxplot(mutation_burden.sum(axis=1))
+            
+            #ax1 = mutation_burden.plot.bar(stacked=True, color= ["#E74C3C", "#3498DB","#27AE60", "#9B59B6"], figsize=(10,7))
+            ax[0].set_ylim(mutation_burden.min().sum() - 0.2*mutation_burden.max().sum() - (mutation_burden.min().sum() - 0.1*mutation_burden.max().sum())%10, mutation_burden.max().sum() + 0.15*mutation_burden.max().sum()+10 - (mutation_burden.max().sum() + 0.2*mutation_burden.max().sum())%10)
+            ax[0].set_xlim(X[0]-0.5, X[-1]+0.5)
+            
+            ax[0].tick_params(axis='x', rotation=0)
+            ax[0].set_xlabel("Sequence ID")
+            ax[0].set_ylabel("Number of simulated mutations")
+            ax[0].xaxis.labelpad= 10
+            ax[0].yaxis.labelpad= 10
+            ax[1].set_xlabel("Boxplot of Total Simulated \n Mutation Burden")
+            
+            colors = {'SBS':"#E74C3C", 'DBS':"#3498DB", 'INS':"#27AE60", 'DEL':"#9B59B6"}         
+            labels = list(colors.keys())
+            handles = [plt.Rectangle((0,0),1,1, color=colors[label]) for label in labels]
+            ax[0].legend(handles, labels)
+            ax[0].set_xticks(list(X))
+            ax[1].set_xticklabels([])
+                
+            canvas = FigureCanvasTkAgg(fig , master=frame1)
+            canvas.get_tk_widget().pack(fill=BOTH, expand=True)
 
-            #canvas = FigureCanvasTkAgg(fig , master=frame1)
-            #canvas.get_tk_widget().pack(fill=BOTH, expand=True)
 
-        if mut_type.lower() not in ["sbs", "dbs", "insertion", "deletion"]:
+        if mut_type.lower() not in ["sbs", "dbs", "insertion", "deletion", "mutation burden"]:
             print("Choose a mutation type from sbs, dbs, insertion or deletion.")
         print(  'Visualization is loading...' )    
         

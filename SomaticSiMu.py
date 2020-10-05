@@ -14,7 +14,9 @@ import os
 import sys
 import multiprocessing
 import time
-
+from multiprocessing import Pool
+import time
+from functools import partial
 
 def abs_path(target_name, directory_level): 
     """
@@ -2474,41 +2476,35 @@ print("Cell 6 (SomaticSiMu) of 6 Loaded")
 
 # %%
 
-from multiprocessing import Pool
-import time
-from functools import partial
-
-
-
 def main(): 
 
-    iterable = range(0, 10)
-    pool = multiprocessing.Pool()
-    #starttime= time.time()
-    
-    cancer_type = "Skin-Melanoma" 
-    reading_frame = 1 
-    std_outlier = 3  
-    simulation_type = "end" 
-    sequence_abs_path = input_file_path  
-    slice_start = 0  
-    slice_end = 50818467  
-    power = 1  
-    syn_rate = 1  
-    non_syn_rate = 1
-                
-    func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
-
-    pool.map(func , iterable )
-    pool.close()
-    pool.join()
-    #print('That took {} seconds'.format(time.time() - starttime))
+    for cancer in ["ColoRect-AdenoCA", "Eso-AdenoCA", "Lung-AdenoCA", "Lung-SCC", "Skin-Melanoma"]:
         
-
+        iterable = range(0, 100)
+        pool = multiprocessing.Pool()
+        starttime= time.time()
+        
+        cancer_type = cancer
+        reading_frame = 1 
+        std_outlier = 3  
+        simulation_type = "end" 
+        sequence_abs_path = input_file_path  
+        slice_start = 0  
+        slice_end = 50818467  
+        power = 1  
+        syn_rate = 1  
+        non_syn_rate = 1
+                    
+        func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
+    
+        pool.map(func , iterable )
+        pool.close()
+        pool.join()
+        print('That took {} seconds'.format(time.time() - starttime))
+        
 if __name__ ==  '__main__':
-    #Cell 8 Loaded
     main()
-    #Cell 7 Loaded
+
 
 
 
