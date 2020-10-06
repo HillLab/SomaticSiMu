@@ -703,6 +703,19 @@ Arguments:
 print("Cell 5 of 8 Loaded")
 
 #%%
+
+cancer_type = "Biliary-AdenoCA"
+reading_frame = 1
+std_outlier = 3
+number_of_lineages = 10
+simulation_type = "end"
+sequence_abs_path = input_file_path
+slice_start = 1
+slice_end = 50818467
+power = 1
+syn_rate = 1
+non_syn_rate = 1
+
 def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, simulation_type, sequence_abs_path, slice_start, slice_end,power=1, syn_rate=1, non_syn_rate=1):
  
     #INPUT CHECKS
@@ -1558,17 +1571,21 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             sample_seq = sample_seq[:int(index_deletion) + offset_index] + sample_seq[int(index_deletion) + 1 + offset_index:]
             offset_index -= 1
       
-        
-      
+        try:
+            os.mkdir(seq_directory + "/" + cancer_type)
+        except OSError:
+            print ("Creation of the directory %s failed" % (seq_directory + "/" + cancer_type))
+        else:
+            print ("Successfully created the directory %s " % (seq_directory + "/" + cancer_type))
+                
         #Write mutated sequence to fasta file
-        sample_sequence_file = seq_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages) + '.fasta'
+        sample_sequence_file = seq_directory + "/" + cancer_type + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages) + '.fasta'
         with open(sample_sequence_file, 'w+') as fasta_file:
             fasta_file.write(">" + str(cancer_type) + "_Lineage_" + str(number_of_lineages) + "_end_stage \n")
             fasta_file.write("")
             fasta_file.write(sample_seq)
             
-            
-            
+  
         #Write SBS mutation frequency tables to csv file
         sbs_freq_path = mut_mat_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_freq_table.csv'
         with open(sbs_freq_path, 'w+'):
@@ -1593,22 +1610,22 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
         
         #Write SBS mutation index tables to csv file
         sbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_index_table.csv'
-        with open(sbs_freq_path, 'w+'):
+        with open(sbs_metadata_path, 'w+'):
             sbs_mut_metadata.to_csv(sbs_metadata_path, index=False)
             
         #Write DBS mutation index tables to csv file
         dbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_dbs_index_table.csv'
-        with open(dbs_freq_path, 'w+'):
+        with open(dbs_metadata_path, 'w+'):
             dbs_mut_metadata.to_csv(dbs_metadata_path, index=False)
           
         #Write Insertion mutation index tables to csv file
         insertion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_ins_index_table.csv'
-        with open(insertion_freq_path, 'w+'):
+        with open(insertion_metadata_path, 'w+'):
             ins_mut_metadata.to_csv(insertion_metadata_path, index=False)
             
         #Write Deletion mutation index tables to csv file
         deletion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_del_index_table.csv'
-        with open(deletion_freq_path, 'w+'):
+        with open(deletion_metadata_path, 'w+'):
             del_mut_metadata.to_csv(deletion_metadata_path, index=False)
             
             
@@ -1616,18 +1633,19 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
         #SBS signatures simulated
         sbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_sbs_sigs.txt'
         with open(sbs_sigs_path , 'a+') as outfile:
-            outfile.write('\n'.join(sbs_sig_combination[0].tolist()) + '\n')
-        
+            outfile.write(str(sbs_sig_combination[0].tolist()))
+            outfile.write("\n")
         #DBS signatures simulated
         dbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_dbs_sigs.txt'
         with open(dbs_sigs_path , 'a+') as outfile:
-            outfile.write('\n'.join(dbs_sig_combination[0].tolist()) + '\n')
-            
+            outfile.write(str(dbs_sig_combination[0].tolist()))
+            outfile.write("\n")
         #ID signatures simulated
         id_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_id_sigs.txt'
         with open(id_sigs_path , 'a+') as outfile:
-            outfile.write('\n'.join(id_sig_combination[0].tolist()) + '\n')
-            
+            outfile.write(str(id_sig_combination[0].tolist()))
+            outfile.write("\n")
+        
             
     
     if simulation_type == "temporal":
@@ -2122,7 +2140,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
                     #Third base of codon and first base of next adjacent codon  
       
                     if read_index == 0:
-                         try:   
+                        try:   
                             if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
                                 pass
                                 
@@ -2414,16 +2432,21 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             for index_deletion in sorted(list(deletion_dict.keys())):
                 sample_seq = sample_seq[:int(index_deletion) + offset_index] + sample_seq[int(index_deletion) + 1 + offset_index:]
                 offset_index -= 1
-          
+ 
+            try:
+                os.mkdir(seq_directory + "/" + cancer_type)
+            except OSError:
+                print ("Creation of the directory %s failed" % (seq_directory + "/" + cancer_type))
+            else:
+                print ("Successfully created the directory %s " % (seq_directory + "/" + cancer_type))
+                    
             #Write mutated sequence to fasta file
-            sample_sequence_file = seq_directory + "/" + cancer_type + '_' + str(i) + '_Stage_Lineage_' + str(number_of_lineages) + '.fasta'
+            sample_sequence_file = seq_directory + "/" + cancer_type + "/" + cancer_type + '_' + str(i) + '_Stage_Lineage_' + str(number_of_lineages) + '.fasta'
             with open(sample_sequence_file, 'w+') as fasta_file:
                 fasta_file.write(">" + str(cancer_type) + "_Lineage_" + str(number_of_lineages) + str(i) + "_stage \n")
                 fasta_file.write("")
                 fasta_file.write(sample_seq)
-                
-                
-                
+     
             #Write SBS mutation frequency tables to csv file
             sbs_freq_path = mut_mat_directory + "/" + cancer_type + '_'+ str(i) + '_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_freq_table.csv'
             with open(sbs_freq_path, 'w+'):
@@ -2448,40 +2471,42 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
                 
             #Write SBS mutation index tables to csv file
             sbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_index_table.csv'
-            with open(sbs_freq_path, 'w+'):
+            with open(sbs_metadata_path, 'w+'):
                 sbs_mut_metadata.to_csv(sbs_metadata_path, index=False)
                 
             #Write DBS mutation index tables to csv file
             dbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_dbs_index_table.csv'
-            with open(dbs_freq_path, 'w+'):
+            with open(dbs_metadata_path, 'w+'):
                 dbs_mut_metadata.to_csv(dbs_metadata_path, index=False)
               
             #Write Insertion mutation index tables to csv file
             insertion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_ins_index_table.csv'
-            with open(insertion_freq_path, 'w+'):
+            with open(insertion_metadata_path, 'w+'):
                 ins_mut_metadata.to_csv(insertion_metadata_path, index=False)
                 
             #Write Deletion mutation index tables to csv file
             deletion_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_del_index_table.csv'
-            with open(deletion_freq_path, 'w+'):
+            with open(deletion_metadata_path, 'w+'):
                 del_mut_metadata.to_csv(deletion_metadata_path, index=False)
                 
-                
-                
+
             #SBS signatures simulated
-            sbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_sbs_sigs.txt'
+            sbs_sigs_path = mut_sigs_directory + "/" + cancer_type + "_" + str(i) + '_Stage_Lineage_sbs_sigs.txt'
             with open(sbs_sigs_path , 'a+') as outfile:
-                outfile.write('\n'.join(sbs_sig_combination[0].tolist()) + '\n')
-            
+                outfile.write(str(sbs_sig_combination[0].tolist()))
+                outfile.write("\n")
             #DBS signatures simulated
-            dbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_dbs_sigs.txt'
+            dbs_sigs_path = mut_sigs_directory + "/" + cancer_type + "_" + str(i) + '_Stage_Lineage_dbs_sigs.txt'
             with open(dbs_sigs_path , 'a+') as outfile:
-                outfile.write('\n'.join(dbs_sig_combination[0].tolist()) + '\n')
-                
+                outfile.write(str(dbs_sig_combination[0].tolist()))
+                outfile.write("\n")
             #ID signatures simulated
-            id_sigs_path = mut_sigs_directory + "/" + cancer_type + '_End_Stage_Lineage_id_sigs.txt'
+            id_sigs_path = mut_sigs_directory + "/" + cancer_type + "_" + str(i) + '_Stage_Lineage_id_sigs.txt'
             with open(id_sigs_path , 'a+') as outfile:
-                outfile.write('\n'.join(id_sig_combination[0].tolist()) + '\n')
+                outfile.write(str(id_sig_combination[0].tolist()))
+                outfile.write("\n")
+                
+              
                 
         
 #Cell 6 Loaded
@@ -2495,8 +2520,9 @@ from tkinter import ttk
 from os.path import isfile, join
 from PIL import Image , ImageTk
 import threading
+from itertools import product
+from functools import partial
 
-count_progress = 0
 
 def multiprocessing_func( p ):
     
@@ -2508,7 +2534,7 @@ def multiprocessing_func( p ):
         somatic_sim(cancer_type = arg[1] , 
                 reading_frame = int(arg[2]) , 
                 std_outlier = int(arg[3]) , 
-                number_of_lineages = number_of_lineages , 
+                number_of_lineages = number_of_lineages, 
                 simulation_type = arg[4] , 
                 sequence_abs_path = abs_path( arg[5].strip() , "File"), 
                 slice_start = int(arg[6]) , 
@@ -2523,8 +2549,6 @@ def multiprocessing_func( p ):
 
 
 
-from itertools import product
-from functools import partial
 
 def run( *lis): 
     global arg
@@ -2535,7 +2559,7 @@ def run( *lis):
     else:          
         
         starttime= time.time()
-        pool = multiprocessing.Pool()
+        pool = multiprocessing.Pool(4)
         
         my_arg  = list ( product( [arg] ,  list( range( int(arg[ 0 ]) ) )  ) )
 
@@ -2660,7 +2684,7 @@ def gui():
 print("Cell 7 (Simulation) of 8 Loaded")
 #%%
 
-
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.patches as patches
