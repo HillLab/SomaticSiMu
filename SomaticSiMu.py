@@ -1267,36 +1267,41 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
                 #Third base of codon and first base of next adjacent codon    
                 if read_index == 0:
                     
-                    if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
-                        pass
-                        
-                    if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
-                        pass
+                    try:
                     
-                    #Check if first codon of original sequence is synonymous to mutated codon
-                    if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
-                        syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                       
-                    #Check if second codon of original sequence is synonymous to mutated codon
-                    if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
-                        syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                        
-                        if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
                             pass
                             
-                        else:
-                            del dbs_dict[mut]
-                            del output_dbs_dict[mut]
-                       
-                    #Both mutated codons are non-synonymous to their original sequence codon                           
-                    else:
-                        syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
-                        
-                        if syn_mutation[0] == 1:
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
                             pass
+                        
+                        #Check if first codon of original sequence is synonymous to mutated codon
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                           
+                        #Check if second codon of original sequence is synonymous to mutated codon
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                            
+                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                pass
+                            
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+    
+                           
+                        #Both mutated codons are non-synonymous to their original sequence codon                           
                         else:
-                            del dbs_dict[mut]
-                            del output_dbs_dict[mut]
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                    except:
+                        pass
         
         #Reading frame starts at the second base
         if reading_frame == 2:
@@ -1356,37 +1361,40 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
                             
                 #Third base of codon and first base of next adjacent codon    
                 if read_index == 1:
+                    try:
                     
-                    if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
-                        pass
-                        
-                    if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
-                        pass
-                    
-                    #Check if first codon of original sequence is synonymous to mutated codon
-                    if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
-                        syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                       
-                    #Check if second codon of original sequence is synonymous to mutated codon
-                    if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
-                        syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                        
-                        if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
                             pass
                             
-                        else:
-                            del dbs_dict[mut]
-                            del output_dbs_dict[mut]
-                       
-                    #Both mutated codons are non-synonymous to their original sequence codon                           
-                    else:
-                        syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
-                        
-                        if syn_mutation[0] == 1:
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
                             pass
+                        
+                        #Check if first codon of original sequence is synonymous to mutated codon
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                           
+                        #Check if second codon of original sequence is synonymous to mutated codon
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                            
+                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                pass
+                                
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                           
+                        #Both mutated codons are non-synonymous to their original sequence codon                           
                         else:
-                            del dbs_dict[mut]
-                            del output_dbs_dict[mut]
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                    except:
+                        pass
                             
         #Reading frame starts at the third base
         if reading_frame == 3:
@@ -1446,38 +1454,41 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
                             
                 #Third base of codon and first base of next adjacent codon    
                 if read_index == 2:
-                    
-                    if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
-                        pass
+                    try:
                         
-                    if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
-                        pass
-                    
-                    #Check if first codon of original sequence is synonymous to mutated codon
-                    if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
-                        syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                       
-                    #Check if second codon of original sequence is synonymous to mutated codon
-                    if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
-                        syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                        
-                        if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
                             pass
                             
-                        else:
-                            del dbs_dict[mut]
-                            del output_dbs_dict[mut]
-                       
-                    #Both mutated codons are non-synonymous to their original sequence codon                           
-                    else:
-                        syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
-                        
-                        if syn_mutation[0] == 1:
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
                             pass
+                        
+                        #Check if first codon of original sequence is synonymous to mutated codon
+                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                           
+                        #Check if second codon of original sequence is synonymous to mutated codon
+                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                            
+                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                pass
+                                
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                           
+                        #Both mutated codons are non-synonymous to their original sequence codon                           
                         else:
-                            del dbs_dict[mut]
-                            del output_dbs_dict[mut]
-               
+                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                            
+                            if syn_mutation[0] == 1:
+                                pass
+                            else:
+                                del dbs_dict[mut]
+                                del output_dbs_dict[mut]
+                   
+                    except:
+                        pass
         
         #96 type SBS mutation frequency matrix
         sbs_mut_freq = sbs_sorted_df.copy().iloc[:,:1].reset_index()
@@ -2116,37 +2127,41 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
                                 
                     #Third base of codon and first base of next adjacent codon    
                     if read_index == 0:
+                        try:
                         
-                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
-                            pass
-                            
-                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
-                            pass
-                        
-                        #Check if first codon of original sequence is synonymous to mutated codon
-                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
-                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                           
-                        #Check if second codon of original sequence is synonymous to mutated codon
-                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
-                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                            
-                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                            if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
                                 pass
                                 
-                            else:
-                                del dbs_dict[mut]
-                                del output_dbs_dict[mut]
-                           
-                        #Both mutated codons are non-synonymous to their original sequence codon                           
-                        else:
-                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
-                            
-                            if syn_mutation[0] == 1:
+                            if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
                                 pass
+                            
+                            #Check if first codon of original sequence is synonymous to mutated codon
+                            if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                                syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                               
+                            #Check if second codon of original sequence is synonymous to mutated codon
+                            if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                                syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                                
+                                if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                    pass
+                                    
+                                else:
+                                    del dbs_dict[mut]
+                                    del output_dbs_dict[mut]
+                               
+                            #Both mutated codons are non-synonymous to their original sequence codon                           
                             else:
-                                del dbs_dict[mut]
-                                del output_dbs_dict[mut]
+                                syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                                
+                                if syn_mutation[0] == 1:
+                                    pass
+                                else:
+                                    del dbs_dict[mut]
+                                    del output_dbs_dict[mut]
+                        
+                        except:
+                            pass
             
             #Reading frame starts at the second base
             if reading_frame == 2:
@@ -2207,36 +2222,40 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
                     #Third base of codon and first base of next adjacent codon    
                     if read_index == 1:
                         
-                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
-                            pass
-                            
-                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
-                            pass
+                        try:
                         
-                        #Check if first codon of original sequence is synonymous to mutated codon
-                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
-                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                           
-                        #Check if second codon of original sequence is synonymous to mutated codon
-                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
-                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                            
-                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                            if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
                                 pass
                                 
-                            else:
-                                del dbs_dict[mut]
-                                del output_dbs_dict[mut]
-                           
-                        #Both mutated codons are non-synonymous to their original sequence codon                           
-                        else:
-                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
-                            
-                            if syn_mutation[0] == 1:
+                            if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
                                 pass
+                            
+                            #Check if first codon of original sequence is synonymous to mutated codon
+                            if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                                syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                               
+                            #Check if second codon of original sequence is synonymous to mutated codon
+                            if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                                syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                                
+                                if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                    pass
+                                    
+                                else:
+                                    del dbs_dict[mut]
+                                    del output_dbs_dict[mut]
+                               
+                            #Both mutated codons are non-synonymous to their original sequence codon                           
                             else:
-                                del dbs_dict[mut]
-                                del output_dbs_dict[mut]
+                                syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                                
+                                if syn_mutation[0] == 1:
+                                    pass
+                                else:
+                                    del dbs_dict[mut]
+                                    del output_dbs_dict[mut]
+                        except:
+                            pass
                                 
             #Reading frame starts at the third base
             if reading_frame == 3:
@@ -2296,37 +2315,39 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
                                 
                     #Third base of codon and first base of next adjacent codon    
                     if read_index == 2:
-                        
-                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
-                            pass
-                            
-                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
-                            pass
-                        
-                        #Check if first codon of original sequence is synonymous to mutated codon
-                        if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
-                            syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                           
-                        #Check if second codon of original sequence is synonymous to mutated codon
-                        if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
-                            syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
-                            
-                            if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                        try:
+                            if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] == sample_seq[mut-2:mut+1]:
                                 pass
                                 
-                            else:
-                                del dbs_dict[mut]
-                                del output_dbs_dict[mut]
-                           
-                        #Both mutated codons are non-synonymous to their original sequence codon                           
-                        else:
-                            syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
-                            
-                            if syn_mutation[0] == 1:
+                            if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] == sample_seq[mut+1:mut+4]:
                                 pass
+                            
+                            #Check if first codon of original sequence is synonymous to mutated codon
+                            if sample_seq[mut-2:mut] + gen_dbs_dict[mut][0] in syn_codon[sample_seq[mut-2:mut+1]]:
+                                syn_mutation_codon_1 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                               
+                            #Check if second codon of original sequence is synonymous to mutated codon
+                            if gen_dbs_dict[mut][1] + sample_seq[mut+2:mut+4] in syn_codon[sample_seq[mut+1:mut+4]]:
+                                syn_mutation_codon_2 = random.choices([1,2],[syn_rate**0.5, 1-syn_rate**0.5])
+                                
+                                if syn_mutation_codon_1[0] and syn_mutation_codon_2[0] == 1:
+                                    pass
+                                    
+                                else:
+                                    del dbs_dict[mut]
+                                    del output_dbs_dict[mut]
+                               
+                            #Both mutated codons are non-synonymous to their original sequence codon                           
                             else:
-                                del dbs_dict[mut]
-                                del output_dbs_dict[mut]
+                                syn_mutation = random.choices([1,2],[non_syn_rate, 1-non_syn_rate])
+                                
+                                if syn_mutation[0] == 1:
+                                    pass
+                                else:
+                                    del dbs_dict[mut]
+                                    del output_dbs_dict[mut]
+                        except:
+                            pass
                    
             
             #96 type SBS mutation frequency matrix
@@ -2379,7 +2400,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
                     
             #Deletion Metadata
             del_mut_metadata = pd.DataFrame(index = range(len(deletion_dict)), columns = ["Type", "Index"])
-            for mutation in range(len(deletions_dict)):
+            for mutation in range(len(deletion_dict)):
                 del_mut_metadata.loc[mutation, "Type"] = list(deletion_dict.values())[mutation]
                 del_mut_metadata.loc[mutation, "Index"] = list(deletion_dict.keys())[mutation]
                 
@@ -2481,7 +2502,7 @@ def main():
     for cancer in ["ColoRect-AdenoCA", "Eso-AdenoCA", "Lung-AdenoCA", "Lung-SCC", "Skin-Melanoma"]:
         
         iterable = range(0, 100)
-        pool = multiprocessing.Pool()
+        pool = multiprocessing.Pool(4)
         starttime= time.time()
         
         cancer_type = cancer
@@ -2504,8 +2525,6 @@ def main():
         
 if __name__ ==  '__main__':
     main()
-
-
 
 
 #%%
