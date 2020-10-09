@@ -812,7 +812,8 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
         kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
         for i in kmer_ref[1:-1]:
             sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
-            kmer_count = kmer_count + sample
+            kmer_count = kmer_count.add(sample, fill_value=0)
+              
             
         kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
         
@@ -1680,7 +1681,8 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
             kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
             for i in kmer_ref[1:-1]:
                 sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
-                kmer_count = kmer_count + sample
+                kmer_count = kmer_count.add(sample, fill_value=0)
+              
                 
             kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
             

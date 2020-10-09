@@ -819,9 +819,11 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
         #Normalization of mutation probabilities to whole genome burden
         ref_dir = abs_path("6-mer",  "Directory")
         kmer_ref = (glob.glob(ref_dir+ "/6-mer_chr*"))
+        kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
         for i in kmer_ref[1:-1]:
             sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
-            kmer_count = kmer_count + sample
+            kmer_count = kmer_count.add(sample, fill_value=0)
+              
             
         kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
         
@@ -1686,8 +1688,8 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
             kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
             for i in kmer_ref[1:-1]:
                 sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
-                kmer_count = kmer_count + sample
-                
+                kmer_count = kmer_count.add(sample, fill_value=0)
+                 
             kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
             
             sample_expected_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
