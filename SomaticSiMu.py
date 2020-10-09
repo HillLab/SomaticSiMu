@@ -806,7 +806,9 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
         sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
         
         #Normalization of mutation probabilities to whole genome burden
-        kmer_ref = (glob.glob("/Users/davidchen/Documents/GitHub/SomaticSiMu/kmer_ref_count/6-mer/6-mer_chr*"))
+        ref_dir = abs_path("6-mer",  "Directory")
+        kmer_ref = (glob.glob(ref_dir+ "/6-mer_chr*"))
+        
         kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
         for i in kmer_ref[1:-1]:
             sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
@@ -1672,7 +1674,9 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
             sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
            
             #Normalization of mutation probabilities to whole genome burden
-            kmer_ref = (glob.glob("/Users/davidchen/Documents/GitHub/SomaticSiMu/kmer_ref_count/6-mer/6-mer_chr*"))
+            
+            ref_dir = abs_path("6-mer",  "Directory")
+            kmer_ref = (glob.glob(ref_dir+ "/6-mer_chr*"))
             kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
             for i in kmer_ref[1:-1]:
                 sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
@@ -2510,13 +2514,13 @@ print("Cell 6 (SomaticSiMu) of 6 Loaded")
 
 def main(): 
 
-    for cancer in ["ColoRect-AdenoCA"]:
+    for cancer in cancer_type_list:
         
         iterable = range(0, 10)
-        pool = multiprocessing.Pool(4)
+        pool = multiprocessing.Pool(1)
         starttime= time.time()
         
-        cancer_type = cancer
+        cancer_type = "Breast-AdenoCA"
         reading_frame = 1 
         std_outlier = 3  
         simulation_type = "end" 
