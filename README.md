@@ -73,6 +73,17 @@ non_syn_rate=1
 "--reference", "-r", help="full file path of reference sequence used as input for the simulation"
 ```
 
+## Output 
+
+Sample: Simulated sequences output into directory named after the type of cancer simulated.
+
+Mutation_Metadata: CSV file output of each mutation simulated; the mutation type and index location on the reference input sequence. One file for each simulated sequence. 
+
+Frequency_Table: CSV file output of summarized counts of each mutation type and local context. One file for each simulated sequence. 
+
+Signature_Combinations: CSV file output of the signature combinations used for each iteration of the simulation. Different combinations of signatures are found operative in the same cancer type and are incorporated into the simulation. One file for each cancer type simulated. 
+
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
