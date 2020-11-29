@@ -17,6 +17,7 @@ import time
 from multiprocessing import Pool
 import time
 from functools import partial
+import argparse
 
 def abs_path(target_name, directory_level): 
     """
@@ -2515,30 +2516,86 @@ print("Cell 6 (SomaticSiMu) of 6 Loaded")
 # %%
 
 def main(): 
-
-    for cancer in cancer_type_list:
-        
-        iterable = range(0, 10)
-        pool = multiprocessing.Pool(1)
-        starttime= time.time()
-        
-        cancer_type = "Breast-AdenoCA"
-        reading_frame = 1 
-        std_outlier = 3  
-        simulation_type = "end" 
-        sequence_abs_path = input_file_path  
-        slice_start = 0  
-        slice_end = 50818467  
-        power = 1  
-        syn_rate = 1  
-        non_syn_rate = 1
-                    
-        func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
     
-        pool.map(func , iterable )
-        pool.close()
-        pool.join()
-        print('That took {} seconds'.format(time.time() - starttime))
+    # Initiate the parser
+    parser = argparse.ArgumentParser(description="SomaticSiMu Parameters")
+    
+    # Add long and short argument
+    parser.add_argument("--generation", "-g", help="number of simulated sequences", default=10)
+    parser.add_argument("--cancer", "-c", help="cancer type")
+    parser.add_argument("--reading_frame", "-f", help="index start of reading frame", default=1)
+    parser.add_argument("--std", "-s", help="exclude signature data outside of n std from the mean", default=3)
+    parser.add_argument("--simulation_type", "-v", help="simulation type", default="end")
+    parser.add_argument("--slice_start", "-a", help="start of the slice of the input sequence")
+    parser.add_argument("--slice_end", "-b", help="end of the slice of the input sequence")
+    parser.add_argument("--power", "-p", help="multiplier of mutation burden from burden observed in in vivo samples", default=1)
+    parser.add_argument("--syn_rate", "-x", help="proportion of synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1)
+    parser.add_argument("--non_syn_rate", "-y", help="proportion of non-synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1)
+    parser.add_argument("--reference", "-r", help="full file path of reference sequence used as input for the simulation")
+    # Read arguments from the command line
+    args = parser.parse_args()
+  
+   
+        
+    if str(args.cancer) == "all":
+        
+        for item in cancer_type_list:
+            try:
+            
+                iterable = range(1, int(args.generation) + 1)
+                pool = multiprocessing.Pool(multiprocessing.cpu_count())
+                starttime= time.time()
+                
+                cancer_type = item
+                reading_frame = int(args.reading_frame)
+                std_outlier = args.std
+                simulation_type = str(args.simulation_type)
+                sequence_abs_path = str(args.reference)
+                slice_start = int(args.slice_start)
+                slice_end = int(args.slice_end)
+                power = args.power
+                syn_rate = args.syn_rate
+                non_syn_rate = args.non_syn_rate
+                            
+                func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
+            
+                pool.map(func , iterable )
+                pool.close()
+                pool.join()
+                print('That took {} seconds'.format(time.time() - starttime))
+            
+            except:
+                pass
+    else:
+        try:
+            if args.cancer not in cancer_type_list:
+                print('Cancer type not found in existing types.')
+            else:
+                iterable = range(1, int(args.generation) + 1)
+                pool = multiprocessing.Pool(multiprocessing.cpu_count())
+                starttime= time.time()
+                
+                cancer_type = str(args.cancer)
+                reading_frame = int(args.reading_frame)
+                std_outlier = args.std
+                simulation_type = str(args.simulation_type)
+                sequence_abs_path = str(args.reference)
+                slice_start = int(args.slice_start)
+                slice_end = int(args.slice_end)
+                power = args.power
+                syn_rate = args.syn_rate
+                non_syn_rate = args.non_syn_rate
+                            
+                func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
+            
+                pool.map(func , iterable )
+                pool.close()
+                pool.join()
+                print('That took {} seconds'.format(time.time() - starttime))
+        except:
+            pass
+        
+    
         
 if __name__ ==  '__main__':
     main()
@@ -2547,6 +2604,27 @@ if __name__ ==  '__main__':
 #%%
 
 
-#for i in [300, 345]:
-#    somatic_sim(cancer_type="Biliary-AdenoCA", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
-    
+#for i in [80, 82, 83, 84, 94, 95]:
+#    try:
+#        somatic_sim(cancer_type="Bone-Benign", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+#    except:
+#        print(i)
+        
+#for i in [20, 26, 27, 28, 29, 30]:
+#    try:
+#        somatic_sim(cancer_type="Myeloid-MPN", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+#    except:
+#        print(i)
+        
+#for i in [74, 93, 95,  97]:
+#    try:
+#        somatic_sim(cancer_type="CNS-PiloAstro", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+#    except:
+#        print("ERROR" + i)
+
+
+
+
+
+
+
