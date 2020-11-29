@@ -3,7 +3,7 @@ SomaticSiMu generates single and double base pair substitutions, and single base
 
 ## Description
 
-Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and finetuning model hyperparameters. SomaticSiMu extracts known signature data from reference signature data, generates novel mutations on an input sequence with respect to a series of user-specified parameters, and outputs the simulated mutated sequence as a machine readable FASTA file and metadata about the position, frequency and local sequence context of each mutation. The simulation can also model temporal directed evolution across early and late stages of 37 cancer types. SomaticSiMu is developed as a lightweight, stand alone, and massively parallel software tool with a graphical user interface, built in documentation and visualization functions of mutation signature plots. The rich selection of input parameters and graphical user interface make SomaticSim both an easy to use application and effective as part of a wide range of experimental scenarios.  
+Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and finetuning model hyperparameters. SomaticSiMu extracts known signature data from reference signature data, generates novel mutations on an input sequence with respect to a series of user-specified parameters, and outputs the simulated mutated sequence as a machine readable FASTA file and metadata about the position, frequency and local sequence context of each mutation. The simulation can also model temporal directed evolution across early and late stages of 37 cancer types. SomaticSiMu is developed as a lightweight, stand alone, and massively parallel software tool with a graphical user interface, built in documentation and visualization functions of mutation signature plots. The rich selection of input parameters and graphical user interface make SomaticSiMu both an easy to use application and effective as part of a wide range of experimental scenarios.  
 
 
 ## Installation
@@ -12,7 +12,7 @@ SomaticSiMu is implemented in Python. As long as Python is installed on your sys
 $ git clone https://github.com/HillLab/SomaticSiMu\
 
 ## Base File Structure
-.
+```
 ├── DBS_Expected_Frequency
 ├── Documentation
 ├── Frequency_Table
@@ -32,7 +32,7 @@ $ git clone https://github.com/HillLab/SomaticSiMu\
 ├── SomaticSiMu.py
 ├── SomaticSiMu_CC.py
 ├── SomaticSiMu_CC.py
-
+```
 
 ## Quick Start
 
