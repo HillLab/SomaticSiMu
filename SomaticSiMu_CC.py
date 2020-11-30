@@ -8,15 +8,14 @@ import collections
 import random
 import numpy as np
 from multiprocessing import Pool    
-import functools
 from collections import defaultdict
 import os
 import sys
 import multiprocessing
 import time
 from multiprocessing import Pool
-import time
 from functools import partial
+import argparse
 
 def abs_path(target_name, directory_level): 
     """
@@ -27,8 +26,9 @@ Arguments:
     directory_level (str): Level of os search, either File or Folder.   
     """
     #Find the relative working directory of the script
-    wk_dir = os.path.dirname(os.path.realpath('__file__'))
-    
+    wk_dir = "/project/def-khill22/dc0420/SomaticSiMu_CC"
+    #wk_dir="/Users/davidchen/Documents/GitHub/SomaticSiMu_CC"
+
     if directory_level == "File":
         #Absolute file path
         for root, dirs, files in os.walk(wk_dir):
@@ -188,7 +188,7 @@ Arguments:
 
 def ref_data(input_name, num=False, prop=False):
     """
-Reads in reference datasets from PCAWG studies.
+Reads in reference datasets from PCAWG dataset.
 
 Arguments:
     input_name (str): Name of csv file 
@@ -211,7 +211,7 @@ Note: Must set only one of num or prop arguments to True.
 
     if prop is True:
             
-        prop_file_path = abs_path(input_name, input_type )
+        prop_file_path = abs_path(input_name, "File")
         prop_data = pd.read_csv(prop_file_path)
         
         return prop_data
@@ -806,18 +806,21 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
         sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
         
         #Normalization of mutation probabilities to whole genome burden
-        kmer_ref = (glob.glob("/Users/davidchen/Documents/GitHub/SomaticSiMu/kmer_ref_count/6-mer/6-mer_chr*"))
-        kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
-        for i in kmer_ref[1:-1]:
-            sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
-            kmer_count = kmer_count + sample
-            
-        kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
+        kmer_ref = (glob.glob("/project/def-khill22/dc0420/SomaticSiMu_CC/kmer_ref_count/6-mer/6-mer_chr*"))
         
+        
+        ref_dir = abs_path("6-mer",  "Directory")
+        kmer_ref = (glob.glob(ref_dir+ "/6-mer_chr*"))
+        kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
+        for i in kmer_ref[1:]:
+            sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
+            kmer_count = kmer_count.add(sample, fill_value=0)
+              
+        kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
         sample_expected_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
+        
         for key in sample_expected_count_dict:
             sample_expected_count_dict[key] = sample_expected_count_dict[key] * (len(sample_seq) / sum(list( kmer_reference_count_dict.values()))) 
-        
         
         normalize_constant = {k: float(sample_count_dict[k])/sample_expected_count_dict[k] for k in sample_count_dict}
         normalized_sample_count_dict = {k: int(sample_count_dict[k]/normalize_constant[k]) for k in sample_count_dict}
@@ -893,7 +896,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
         print(dbs_sig_combination)
     
         for keys in list(sample_index_dict.keys()):
-            
+          
             count=1
             for length in list(range(1, len(keys))):
                 if keys[length] == keys[0]:
@@ -1672,12 +1675,12 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
             sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
            
             #Normalization of mutation probabilities to whole genome burden
-            kmer_ref = (glob.glob("/Users/davidchen/Documents/GitHub/SomaticSiMu/kmer_ref_count/6-mer/6-mer_chr*"))
+            kmer_ref = (glob.glob("/project/def-khill22/dc0420/SomaticSiMu_CC/kmer_ref_count/6-mer/6-mer_chr*"))
             kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
-            for i in kmer_ref[1:-1]:
+            for i in kmer_ref[1:]:
                 sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
-                kmer_count = kmer_count + sample
-                
+                kmer_count = kmer_count.add(sample, fill_value=0)
+                    
             kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
             
             sample_expected_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)["6"], kmer_count))
@@ -2430,9 +2433,9 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
             try:
                 os.mkdir(seq_directory + "/" + cancer_type)
             except OSError:
-                print ("Creation of the directory %s failed" % (seq_directory + "/" + cancer_type))
+                print ("Creation of the directory %s failed; check if it has been made already." % (seq_directory + "/" + cancer_type))
             else:
-                print ("Successfully created the directory %s " % (seq_directory + "/" + cancer_type))
+                print ("Successfully created the new directory %s " % (seq_directory + "/" + cancer_type))
                     
             #Write mutated sequence to fasta file
             sample_sequence_file = seq_directory + "/" + cancer_type + "/" + cancer_type + '_' + str(i) + '_Stage_Lineage_' + str(number_of_lineages) + '.fasta'
@@ -2463,8 +2466,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, simulation_type, sequen
             with open(deletion_freq_path, 'w+'):
                 del_mut_freq.to_csv(deletion_freq_path, index=False)
                 
-                
-                
+                    
             #Write SBS mutation index tables to csv file
             sbs_metadata_path = mut_metadata_directory + "/" + cancer_type + '_End_Stage_Lineage_' + str(number_of_lineages)+ '_sbs_index_table.csv'
             with open(sbs_metadata_path, 'w+'):
@@ -2508,39 +2510,125 @@ print("Cell 6 (SomaticSiMu) of 6 Loaded")
 
 # %%
 
-def main(): 
+#def main(): 
 
-    for cancer in cancer_type_list:
+#    for cancer in cancer_type_list:
+#        try:
+#            iterable = range(100,200)
+#            ncpus = int(os.environ.get('SLURM_CPUS_PER_TASK',default=8)) 
+#            pool = multiprocessing.Pool(processes=ncpus)
+            #starttime= time.time()
+            
+#            cancer_type = cancer
+#            reading_frame = 1 
+#            std_outlier = 3  
+#            simulation_type = "end" 
+#            sequence_abs_path = input_file_path  
+#            slice_start = 0  
+#            slice_end = 50818467  
+#            power = 1  
+#            syn_rate = 1  
+#            non_syn_rate = 1
+                        
+#            func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
         
-        iterable = range(0, 500)
-        pool = multiprocessing.Pool(1)
-        starttime= time.time()
+ #           pool.map(func , iterable )
+ #           pool.close()
+ #           pool.join()
+ #       except:
+ #           pass
+    #print('That took {} seconds'.format(time.time() - starttime))
         
-        cancer_type = cancer
-        reading_frame = 1 
-        std_outlier = 3  
-        simulation_type = "end" 
-        sequence_abs_path = input_file_path  
-        slice_start = 0  
-        slice_end = 50818467  
-        power = 1  
-        syn_rate = 1  
-        non_syn_rate = 1
-                    
-        func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
+#if __name__ ==  '__main__':
+#    main()
+
+def main(): 
     
-        pool.map(func , iterable )
-        pool.close()
-        pool.join()
-        print('That took {} seconds'.format(time.time() - starttime))
+    # Initiate the parser
+    parser = argparse.ArgumentParser(description="SomaticSiMu Parameters")
+    
+    # Add long and short argument
+    parser.add_argument("--generation", "-g", help="number of simulated sequences", default=10)
+    parser.add_argument("--cancer", "-c", help="cancer type")
+    parser.add_argument("--reading_frame", "-f", help="index start of reading frame", default=1)
+    parser.add_argument("--std", "-s", help="exclude signature data outside of n std from the mean", default=3)
+    parser.add_argument("--simulation_type", "-v", help="simulation type", default="end")
+    parser.add_argument("--slice_start", "-a", help="start of the slice of the input sequence")
+    parser.add_argument("--slice_end", "-b", help="end of the slice of the input sequence")
+    parser.add_argument("--power", "-p", help="multiplier of mutation burden from burden observed in in vivo samples", default=1)
+    parser.add_argument("--syn_rate", "-x", help="proportion of synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1)
+    parser.add_argument("--non_syn_rate", "-y", help="proportion of non-synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1)
+    parser.add_argument("--reference", "-r", help="full file path of reference sequence used as input for the simulation")
+    # Read arguments from the command line
+    args = parser.parse_args()
+  
+   
+        
+    if str(args.cancer) == "all":
+        
+        for item in cancer_type_list:
+            try:
+            
+                iterable = range(1, int(args.generation) + 1)
+                ncpus = int(os.environ.get('SLURM_CPUS_PER_TASK',default=8)) 
+                pool = multiprocessing.Pool(processes=ncpus)
+                starttime= time.time()
+                
+                cancer_type = item
+                reading_frame = int(args.reading_frame)
+                std_outlier = args.std
+                simulation_type = str(args.simulation_type)
+                sequence_abs_path = str(args.reference)
+                slice_start = int(args.slice_start)
+                slice_end = int(args.slice_end)
+                power = args.power
+                syn_rate = args.syn_rate
+                non_syn_rate = args.non_syn_rate
+                            
+                func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
+            
+                pool.map(func , iterable )
+                pool.close()
+                pool.join()
+                print('That took {} seconds'.format(time.time() - starttime))
+            
+            except:
+                pass
+    else:
+        try:
+            if args.cancer not in cancer_type_list:
+                print('Cancer type not found in existing types.')
+            else:
+                iterable = range(1, int(args.generation) + 1)
+                pool = multiprocessing.Pool(multiprocessing.cpu_count())
+                starttime= time.time()
+                
+                cancer_type = str(args.cancer)
+                reading_frame = int(args.reading_frame)
+                std_outlier = args.std
+                simulation_type = str(args.simulation_type)
+                sequence_abs_path = str(args.reference)
+                slice_start = int(args.slice_start)
+                slice_end = int(args.slice_end)
+                power = args.power
+                syn_rate = args.syn_rate
+                non_syn_rate = args.non_syn_rate
+                            
+                func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, simulation_type, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate)
+            
+                pool.map(func , iterable )
+                pool.close()
+                pool.join()
+                print('That took {} seconds'.format(time.time() - starttime))
+        except:
+            pass
+        
+    
         
 if __name__ ==  '__main__':
+
     main()
-
-
-#%%
-
-
-#for i in [300, 345]:
-#    somatic_sim(cancer_type="Biliary-AdenoCA", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
+  
     
+
+

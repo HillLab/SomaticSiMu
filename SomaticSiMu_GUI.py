@@ -2754,6 +2754,8 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
 
         if mut_type.lower() == "sbs":
             
+        if mut_type.lower() == "sbs":
+            
             graph_data = pd.DataFrame(index=(range(96)), columns=range(gen_start, gen_end+1))
             
             for gen in range(gen_start, gen_end+1):
@@ -2770,6 +2772,7 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                  graph_data[gen] = graph_data[gen].div(graph_data[gen].sum())
             
             graph_data.sort_values(by=["Type","SubType"],inplace=True )
+            graph_data.fillna(0, inplace=True)
             
             if len(range(gen_start, gen_end+1)) > 1:
                 
@@ -2777,7 +2780,7 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 per_95 = []
                 for i in upper_error:
                     per_95.append(i - graph_data.iloc[upper_error.index(i), :-2].mean(axis=0))
-                
+                per_95 = [100*x for x in per_95]
                 
                 lower_error = [graph_data.iloc[mut,:-2].quantile(0.05) for mut in range(96)]
                 per_5 = []
@@ -2788,7 +2791,7 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                     else:  
                         per_5.append(graph_data.iloc[counter, :-2].mean(axis=0) - i)
                     counter += 1
-                
+                per_5 = [100*x for x in per_5]
             
                 fig = plt.figure(figsize=(50, 10))
                 ax = fig.add_subplot(111)
@@ -2798,12 +2801,12 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 
                 color_list = [(0.416, 0.733, 0.918), (0,0,0), (0.765, 0.172, 0.157), (0.785, 0.785, 0.785), (0.678, 0.808, 0.412), (0.878, 0.773, 0.769)]
                 
-                p1 = ax.bar(range(0,16), graph_data.iloc[0:16, :-2].mean(axis=1), bottom=0, color = color_list[0], yerr = (per_5[0:16], per_95[0:16]),capsize=5)
-                p2 = ax.bar(range(16,32), graph_data.iloc[16:32, :-2].mean(axis=1), bottom=0, color = color_list[1], yerr = (per_5[16:32], per_95[16:32]),capsize=5)
-                p3 = ax.bar(range(32,48), graph_data.iloc[32:48, :-2].mean(axis=1), bottom=0, color = color_list[2], yerr = (per_5[32:48], per_95[32:48]),capsize=5)
-                p4 = ax.bar(range(48,64), graph_data.iloc[48:64, :-2].mean(axis=1), bottom=0, color = color_list[3], yerr = (per_5[48:64], per_95[48:64]),capsize=5)
-                p5 = ax.bar(range(64,80), graph_data.iloc[64:80, :-2].mean(axis=1), bottom=0, color = color_list[4], yerr = (per_5[64:80], per_95[64:80]),capsize=5)
-                p6 = ax.bar(range(80,96), graph_data.iloc[80:96, :-2].mean(axis=1), bottom=0, color = color_list[5], yerr = (per_5[80:96], per_95[80:96]),capsize=5)
+                p1 = ax.bar(range(0,16), graph_data.iloc[0:16, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[0], yerr = (per_5[0:16], per_95[0:16]),capsize=5)
+                p2 = ax.bar(range(16,32), graph_data.iloc[16:32, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[1], yerr = (per_5[16:32], per_95[16:32]),capsize=5)
+                p3 = ax.bar(range(32,48), graph_data.iloc[32:48, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[2], yerr = (per_5[32:48], per_95[32:48]),capsize=5)
+                p4 = ax.bar(range(48,64), graph_data.iloc[48:64, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[3], yerr = (per_5[48:64], per_95[48:64]),capsize=5)
+                p5 = ax.bar(range(64,80), graph_data.iloc[64:80, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[4], yerr = (per_5[64:80], per_95[64:80]),capsize=5)
+                p6 = ax.bar(range(80,96), graph_data.iloc[80:96, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[5], yerr = (per_5[80:96], per_95[80:96]),capsize=5)
                   
             else:
             
@@ -2815,12 +2818,12 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 
                 color_list = [(0.416, 0.733, 0.918), (0,0,0), (0.765, 0.172, 0.157), (0.785, 0.785, 0.785), (0.678, 0.808, 0.412), (0.878, 0.773, 0.769)]
                 
-                p1 = ax.bar(range(0,16), graph_data.iloc[0:16, :-2].mean(axis=1), bottom=0, color = color_list[0])
-                p2 = ax.bar(range(16,32), graph_data.iloc[16:32, :-2].mean(axis=1), bottom=0, color = color_list[1])
-                p3 = ax.bar(range(32,48), graph_data.iloc[32:48, :-2].mean(axis=1), bottom=0, color = color_list[2])
-                p4 = ax.bar(range(48,64), graph_data.iloc[48:64, :-2].mean(axis=1), bottom=0, color = color_list[3])
-                p5 = ax.bar(range(64,80), graph_data.iloc[64:80, :-2].mean(axis=1), bottom=0, color = color_list[4])
-                p6 = ax.bar(range(80,96), graph_data.iloc[80:96, :-2].mean(axis=1), bottom=0, color = color_list[5])
+                p1 = ax.bar(range(0,16), graph_data.iloc[0:16, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[0])
+                p2 = ax.bar(range(16,32), graph_data.iloc[16:32, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[1])
+                p3 = ax.bar(range(32,48), graph_data.iloc[32:48, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[2])
+                p4 = ax.bar(range(48,64), graph_data.iloc[48:64, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[3])
+                p5 = ax.bar(range(64,80), graph_data.iloc[64:80, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[4])
+                p6 = ax.bar(range(80,96), graph_data.iloc[80:96, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[5])
                 
                 
                 
@@ -2879,11 +2882,13 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                     
             graph_data['2mer_index'] = df_read_in['2mer_index']
             graph_data['Mutation Type'] = df_read_in['Mutation Type']
+            graph_data.fillna(0, inplace=True)
             
             for gen in range(gen_start, gen_end+1):
                  graph_data[gen] = graph_data[gen].div(graph_data[gen].sum())
             
             graph_data.sort_values(by=["Mutation Type", "2mer_index"],inplace=True)
+            graph_data.fillna(0, inplace=True)
             
 
             if len(range(gen_start, gen_end+1)) > 1:
@@ -2896,16 +2901,16 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                     else:
                         per_95.append(i - graph_data.iloc[counter, :-2].mean(axis=0))
                         counter += 1
-                per_95 =  [0 if i < 0 else i for i in per_95]
+                per_95 =  [0 if i < 0 else i*100 for i in per_95]
                        
-                lower_error = [graph_data.iloc[mut,:-2].quantile(0.05) for mut in range(78)]
+                lower_error = [graph_data.iloc[mut,:-2].quantile(0.05)*100 for mut in range(78)]
                 per_5 = []
                 counter = 0
                 for i in lower_error:
                     if i == 0:
-                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0))
+                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0)*100)
                     else:  
-                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0) - i)
+                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0)*100 - i)
                     counter += 1
 
                 fig = plt.figure(figsize=(50, 10))
@@ -2925,16 +2930,16 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                               (0.737, 0.588, 0.984),
                               (0.263, 0.0118, 0.584)]
                 
-                p1 = ax.bar(range(0,9), graph_data.iloc[0:9, :-2].mean(axis=1), bottom=0, color = color_list[0], yerr = (per_5[0:9], per_95[0:9]),capsize=5)
-                p2 = ax.bar(range(9,15), graph_data.iloc[9:15, :-2].mean(axis=1), bottom=0, color = color_list[1], yerr = (per_5[9:15], per_95[9:15]),capsize=5)
-                p3 = ax.bar(range(15,24), graph_data.iloc[15:24, :-2].mean(axis=1), bottom=0, color = color_list[2], yerr = (per_5[15:24], per_95[15:24]),capsize=5)
-                p4 = ax.bar(range(24,30), graph_data.iloc[24:30, :-2].mean(axis=1), bottom=0, color = color_list[3], yerr = (per_5[24:30], per_95[24:30]),capsize=5)
-                p5 = ax.bar(range(30,39), graph_data.iloc[30:39, :-2].mean(axis=1), bottom=0, color = color_list[4], yerr = (per_5[30:39], per_95[30:39]),capsize=5)
-                p6 = ax.bar(range(39,45), graph_data.iloc[39:45, :-2].mean(axis=1), bottom=0, color = color_list[5], yerr = (per_5[39:45], per_95[39:45]),capsize=5)
-                p7 = ax.bar(range(45,51), graph_data.iloc[45:51, :-2].mean(axis=1), bottom=0, color = color_list[6], yerr = (per_5[45:51], per_95[45:51]),capsize=5)
-                p8 = ax.bar(range(51,60), graph_data.iloc[51:60, :-2].mean(axis=1), bottom=0, color = color_list[7], yerr = (per_5[51:60], per_95[51:60]),capsize=5)
-                p9 = ax.bar(range(60,69), graph_data.iloc[60:69, :-2].mean(axis=1), bottom=0, color = color_list[8], yerr = (per_5[60:69], per_95[60:69]),capsize=5)
-                p10 = ax.bar(range(69,78), graph_data.iloc[69:78, :-2].mean(axis=1), bottom=0, color = color_list[9], yerr = (per_5[69:78], per_95[69:78]),capsize=5)
+                p1 = ax.bar(range(0,9), graph_data.iloc[0:9, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[0], yerr = (per_5[0:9], per_95[0:9]),capsize=5)
+                p2 = ax.bar(range(9,15), graph_data.iloc[9:15, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[1], yerr = (per_5[9:15], per_95[9:15]),capsize=5)
+                p3 = ax.bar(range(15,24), graph_data.iloc[15:24, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[2], yerr = (per_5[15:24], per_95[15:24]),capsize=5)
+                p4 = ax.bar(range(24,30), graph_data.iloc[24:30, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[3], yerr = (per_5[24:30], per_95[24:30]),capsize=5)
+                p5 = ax.bar(range(30,39), graph_data.iloc[30:39, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[4], yerr = (per_5[30:39], per_95[30:39]),capsize=5)
+                p6 = ax.bar(range(39,45), graph_data.iloc[39:45, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[5], yerr = (per_5[39:45], per_95[39:45]),capsize=5)
+                p7 = ax.bar(range(45,51), graph_data.iloc[45:51, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[6], yerr = (per_5[45:51], per_95[45:51]),capsize=5)
+                p8 = ax.bar(range(51,60), graph_data.iloc[51:60, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[7], yerr = (per_5[51:60], per_95[51:60]),capsize=5)
+                p9 = ax.bar(range(60,69), graph_data.iloc[60:69, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[8], yerr = (per_5[60:69], per_95[60:69]),capsize=5)
+                p10 = ax.bar(range(69,78), graph_data.iloc[69:78, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[9], yerr = (per_5[69:78], per_95[69:78]),capsize=5)
                 
             else:
                 fig = plt.figure(figsize=(50, 10))
@@ -2954,16 +2959,16 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                               (0.737, 0.588, 0.984),
                               (0.263, 0.0118, 0.584)]
                 
-                p1 = ax.bar(range(0,9), graph_data.iloc[0:9, 2], bottom=0, color = color_list[0])
-                p2 = ax.bar(range(9,15), graph_data.iloc[9:15, 2], bottom=0, color = color_list[1])
-                p3 = ax.bar(range(15,24), graph_data.iloc[15:24, 2], bottom=0, color = color_list[2])
-                p4 = ax.bar(range(24,30), graph_data.iloc[24:30, 2], bottom=0, color = color_list[3])
-                p5 = ax.bar(range(30,39), graph_data.iloc[30:39, 2], bottom=0, color = color_list[4])
-                p6 = ax.bar(range(39,45), graph_data.iloc[39:45, 2], bottom=0, color = color_list[5])
-                p7 = ax.bar(range(45,51), graph_data.iloc[45:51, 2], bottom=0, color = color_list[6])
-                p8 = ax.bar(range(51,60), graph_data.iloc[51:60, 2], bottom=0, color = color_list[7])
-                p9 = ax.bar(range(60,69), graph_data.iloc[60:69, 2], bottom=0, color = color_list[8])
-                p10 = ax.bar(range(69,78), graph_data.iloc[69:78, 2], bottom=0, color = color_list[9])
+                p1 = ax.bar(range(0,9), graph_data.iloc[0:9, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[0])
+                p2 = ax.bar(range(9,15), graph_data.iloc[9:15, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[1])
+                p3 = ax.bar(range(15,24), graph_data.iloc[15:24, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[2])
+                p4 = ax.bar(range(24,30), graph_data.iloc[24:30, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[3])
+                p5 = ax.bar(range(30,39), graph_data.iloc[30:39, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[4])
+                p6 = ax.bar(range(39,45), graph_data.iloc[39:45, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[5])
+                p7 = ax.bar(range(45,51), graph_data.iloc[45:51, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[6])
+                p8 = ax.bar(range(51,60), graph_data.iloc[51:60, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[7])
+                p9 = ax.bar(range(60,69), graph_data.iloc[60:69, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[8])
+                p10 = ax.bar(range(69,78), graph_data.iloc[69:78, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[9])
 
             y_limit = ax.get_ylim()[1]
             
@@ -3039,6 +3044,7 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                  graph_data[gen] = graph_data[gen].div(graph_data[gen].sum())
             
             graph_data.sort_values(by=["Index","Mutation Type"],inplace=True )
+            graph_data.fillna(0, inplace=True)
             
 
             if len(range(gen_start, gen_end+1)) > 1:
@@ -3052,16 +3058,16 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                     else:
                         per_95.append(i - graph_data.iloc[counter, :-2].mean(axis=0))
                         counter += 1
-                per_95 =  [0 if i < 0 else i for i in per_95]
+                per_95 =  [0 if i < 0 else i*100 for i in per_95]
                        
                 lower_error = [graph_data.iloc[mut,:-2].quantile(0.05) for mut in range(12)]
                 per_5 = []
                 counter = 0
                 for i in lower_error:
                     if i == 0:
-                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0))
+                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0)*100)
                     else:  
-                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0) - i)
+                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0)*100 - i)
                     counter += 1
 
                 fig = plt.figure(figsize=(50, 10))
@@ -3072,8 +3078,8 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 color_list = [(0.949, 0.753, 0.478), 
                               (0.937, 0.512, 0.2)]
                 
-                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]),capsize=5)
-                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]),capsize=5)
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]),capsize=5)
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]),capsize=5)
                 
             else:
                 fig = plt.figure(figsize=(50, 10))
@@ -3084,8 +3090,8 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 color_list = [(0.949, 0.753, 0.478), 
                               (0.937, 0.512, 0.2)]
                 
-                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0])
-                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1])
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[0])
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[1])
                 
                
             y_limit = ax.get_ylim()[1]
@@ -3136,6 +3142,7 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                  graph_data[gen] = graph_data[gen].div(graph_data[gen].sum())
             
             graph_data.sort_values(by=["Index","Mutation Type"],inplace=True )
+            graph_data.fillna(0, inplace=True)
             
 
             if len(range(gen_start, gen_end+1)) > 1:
@@ -3149,16 +3156,16 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                     else:
                         per_95.append(i - graph_data.iloc[counter, :-2].mean(axis=0))
                         counter += 1
-                per_95 =  [0 if i < 0 else i for i in per_95]
+                per_95 =  [0 if i < 0 else i*100 for i in per_95]
                        
                 lower_error = [graph_data.iloc[mut,:-2].quantile(0.05) for mut in range(12)]
                 per_5 = []
                 counter = 0
                 for i in lower_error:
                     if i == 0:
-                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0))
+                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0)*100)
                     else:  
-                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0) - i)
+                        per_5.append(graph_data.iloc[counter, :-2].mean(axis=0)*100 - i)
                     counter += 1
             
                 fig = plt.figure(figsize=(50, 10))
@@ -3169,8 +3176,8 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 color_list = [(0.727, 0.855, 0.569), 
                           (0.345, 0.612, 0.247)]
             
-                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]),capsize=5)
-                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]),capsize=5)
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[0],  yerr = (per_5[0:6], per_95[0:6]),capsize=5)
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[1],  yerr = (per_5[6:12], per_95[6:12]),capsize=5)
                 
             else:
                 fig = plt.figure(figsize=(50, 10))
@@ -3181,8 +3188,8 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
                 color_list = [(0.727, 0.855, 0.569), 
                           (0.345, 0.612, 0.247)]
             
-                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1), bottom=0, color = color_list[0])
-                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1), bottom=0, color = color_list[1])
+                p1 = ax.bar(range(0,6), graph_data.iloc[0:6, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[0])
+                p2 = ax.bar(range(6,12), graph_data.iloc[6:12, :-2].mean(axis=1).multiply(100), bottom=0, color = color_list[1])
                 
                
             y_limit = ax.get_ylim()[1]
