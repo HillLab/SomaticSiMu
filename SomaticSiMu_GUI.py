@@ -306,6 +306,7 @@ sbs_freq_folder_path = abs_path("SBS_Expected_Frequency", "Directory")
 dbs_freq_folder_path = abs_path("DBS_Expected_Frequency", "Directory")
 id_freq_folder_path = abs_path("ID_Expected_Frequency", "Directory")
 
+
 #Cell 2 Loaded
 print("Cell 2 of 8 Loaded")
 
@@ -2578,7 +2579,7 @@ class New_wind_open:
         self.root  , self.txt = root , txt
         self.new_wind  =Toplevel( self.root )
         self.new_wind.title('SomaticSiMu')
-        self.new_wind.geometry('500x500')
+        self.new_wind.geometry('700x550')
         self.new_wind.resizable(0,0)
 
         self.frame4 = Frame( self.new_wind , height=200, width=200 )
@@ -2596,7 +2597,7 @@ def make(root , txt):
 
 def open_img(root , name):
     new_img_wind = Toplevel(root)
-    new_img_wind.geometry('700x550')
+    new_img_wind.geometry('600x510')
     new_img_wind.resizable(0,0)
 
     frame6 = Frame( new_img_wind , height=150, width=150 )
@@ -2754,7 +2755,6 @@ def mut_catalog(cancer_type, simulation_type, gen_start, gen_end, mut_type):
 
         if mut_type.lower() == "sbs":
             
-        if mut_type.lower() == "sbs":
             
             graph_data = pd.DataFrame(index=(range(96)), columns=range(gen_start, gen_end+1))
             
