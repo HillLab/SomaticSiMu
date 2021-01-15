@@ -11,7 +11,7 @@ SomaticSiMu is implemented in Python. As long as Python is installed on your sys
 
 $ git clone https://github.com/HillLab/SomaticSiMu\
 
-## Base File Structure
+## File Structure
 ```
 ├── DBS_Expected_Frequency
 ├── Documentation
@@ -65,8 +65,8 @@ non_syn_rate=1
 "--reading_frame", "-f", help="index start of reading frame", default=1
 "--std", "-s", help="exclude signature data outside of n std from the mean", default=3
 "--simulation_type", "-v", help="simulation type", default="end"
-"--slice_start", "-a", help="start of the slice of the input sequence"
-"--slice_end", "-b", help="end of the slice of the input sequence"
+"--slice_start", "-a", help="start of the slice of the input sequence, default=None (start at first base)"
+"--slice_end", "-b", help="end of the slice of the input sequence, default=None (end at first base)"
 "--power", "-p", help="multiplier of mutation burden from burden observed in in vivo samples", default=1
 "--syn_rate", "-x", help="proportion of synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1
 "--non_syn_rate", "-y", help="proportion of non-synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1
@@ -90,4 +90,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+Apache License Version 2.0
