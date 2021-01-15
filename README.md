@@ -91,3 +91,6 @@ Please make sure to update tests as appropriate.
 
 ## License
 Apache License Version 2.0
+
+## PyPi Hosting
+https://pypi.org/project/SomaticSiMu/0.0.1/
