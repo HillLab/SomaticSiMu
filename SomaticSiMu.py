@@ -2601,26 +2601,6 @@ if __name__ ==  '__main__':
     main()
 
 
-#%%
-
-
-#for i in [80, 82, 83, 84, 94, 95]:
-#    try:
-#        somatic_sim(cancer_type="Bone-Benign", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
-#    except:
-#        print(i)
-        
-#for i in [20, 26, 27, 28, 29, 30]:
-#    try:
-#        somatic_sim(cancer_type="Myeloid-MPN", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
-#    except:
-#        print(i)
-        
-#for i in [74, 93, 95,  97]:
-#    try:
-#        somatic_sim(cancer_type="CNS-PiloAstro", reading_frame=1, std_outlier=3, number_of_lineages=i, simulation_type="end", sequence_abs_path=input_file_path, slice_start=1, slice_end=50818467,power=1, syn_rate=1, non_syn_rate=1)
-#    except:
-#        print("ERROR" + i)
 
 
 
