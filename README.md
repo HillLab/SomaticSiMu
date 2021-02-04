@@ -90,7 +90,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## License
-Apache License Version 2.0
+Creative Commons Creative Commons Attribution 4.0 International license
 
 ## PyPi Hosting
 https://pypi.org/project/SomaticSiMu/0.0.1/
