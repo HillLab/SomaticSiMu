@@ -885,7 +885,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
         with open(sample_sequence_file, 'w+') as fasta_file:
             fasta_file.write(">" + str(cancer_type) + "_Sequence_" + str(number_of_lineages) + "\n")
             fasta_file.write("")
-            fasta_file.write(sample)
+            fasta_file.write(sample_seq)
             
         #Write SBS mutation frequency tables to csv file
         sbs_freq_path = "Metadata/" + cancer_type + "/" + cancer_type + '_Sequence_' + str(number_of_lineages)+ '_sbs_freq_table.csv'

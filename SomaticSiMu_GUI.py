@@ -2540,7 +2540,7 @@ def multiprocessing_func( p ):
                 std_outlier = int(arg[3]) , 
                 number_of_lineages = number_of_lineages, 
                 simulation_type = arg[4] , 
-                sequence_abs_path = abs_path( arg[5].strip() , "File"), 
+                sequence_abs_path = arg[5] , 
                 slice_start = int(arg[6]) , 
                 slice_end = int(arg[7]) , 
                 power=int(arg[8]) , 

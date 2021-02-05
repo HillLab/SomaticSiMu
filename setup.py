@@ -4,11 +4,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="SomaticSiMu", # Replace with your own username
+    name="SomaticSiMu", 
     version="0.0.1",
     author="David Chen",
     author_email="dchen362@uwo.ca",
-    description="A small example package",
+    description="Mutational Signature Simulation",
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=["pandas", "numpy"],
