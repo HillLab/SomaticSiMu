@@ -720,17 +720,6 @@ print("Cell 5 of 8 Loaded")
 
 #%%
 
-cancer_type = "Biliary-AdenoCA"
-reading_frame = 1
-std_outlier = 3
-number_of_lineages = 10
-simulation_type = "end"
-sequence_abs_path = input_file_path
-slice_start = 1
-slice_end = 50818467
-power = 1
-syn_rate = 1
-non_syn_rate = 1
 
 def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, simulation_type, sequence_abs_path, slice_start, slice_end,power=1, syn_rate=1, non_syn_rate=1):
  
@@ -838,7 +827,9 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
         sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
 
         #Number of mutations to simulate
-        n_mutations = round((sbs_num_data[cancer_type].max() / 3096649726) * len(sample_seq))
+        #CHANGE THE NUMBER 10 TO ANY OTHER NUMBER FOR INCREASE MUTATION LOAD BY A FACTOR
+        #e.g. Currently, 10 means 10 times the mutation load expected in vivo
+        n_mutations = int(round((sbs_num_data[cancer_type].max() / 3096649726) * len(sample_seq)) * 10)
         
         
         #Signature probabilities
@@ -2795,12 +2786,15 @@ def run( *lis):
 print("Cell 7 (Simulation) of 8 Loaded")
 #%%
 
-import matplotlib
-import matplotlib.pyplot as plt
+#import matplotlib 
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.patches as patches
 from matplotlib.figure import Figure
-matplotlib.use("TkAgg")
+import matplotlib.pyplot as plt
+import tkinter
+import matplotlib
+matplotlib.use('TKAgg')
 
 def gui2():
     global screen2
