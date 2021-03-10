@@ -312,8 +312,7 @@ id_freq_folder_path = abs_path("ID_Expected_Frequency", "Directory")
 Breast Cancer Subtype
 """
 breast_subtype = pd.read_excel(abs_path("Cancer Mutations.xlsx","File"))
-breast = breast_subtype[(breast_subtype["ER Status"]=='Negative') & (breast_subtype["PR Status"]=='Negative') & (breast_subtype["HER Status"]=='Negative')]
-
+#breast = breast_subtype[(breast_subtype["ER Status"]=='Negative') & (breast_subtype["PR Status"]=='Negative') & (breast_subtype["HER Status"]=='Negative')]
 
 #Cell 2 Loaded
 print("Cell 2 of 8 Loaded")
