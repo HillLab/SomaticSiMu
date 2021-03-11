@@ -854,7 +854,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, number_of_lineages, sim
                 position = random.choice(sample_index_dict[mutation_filtered_df.iloc[i, 1]])
                 
                 if sample_seq[position+1] == mutation_filtered_df.iloc[i, 0][0]:
-                    sample = sample_seq[:position] + mutation_filtered_df.iloc[i, 0][2] + sample_seq[position+1:]
+                    sample_seq = sample_seq[:position] + mutation_filtered_df.iloc[i, 0][2] + sample_seq[position+1:]
                 else:
                     print("Wrong index!")
        
