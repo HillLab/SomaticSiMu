@@ -31,7 +31,6 @@ $ git clone https://github.com/HillLab/SomaticSiMu\
 │   ├── 6-mer
 ├── SomaticSiMu.py
 ├── SomaticSiMu_CC.py
-├── SomaticSiMu_CC.py
 ```
 
 ## Quick Start
