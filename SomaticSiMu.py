@@ -5,9 +5,7 @@ import pandas as pd
 import glob
 import collections
 import random
-import numpy as np
-from multiprocessing import Pool    
-import functools
+import numpy as np  
 from collections import defaultdict
 import os
 import sys
@@ -16,6 +14,8 @@ import time
 from functools import partial
 import argparse
 from tqdm import tqdm
+from itertools import product
+
 
 def abs_path(target_name, directory_level): 
     """
@@ -414,24 +414,55 @@ Arguments:
     sample_index_dict = defaultdict(list)
     
     for seq_len in range(0, len(sample)-kmer_length):
+        
         if 'N' in sample[seq_len:seq_len+kmer_length]:
             pass
         
         else:
+
             sample_index_dict[str(sample[seq_len:seq_len+kmer_length])].append(seq_len)
             
 
     if count is True:
         sample_count_dict = {key: len(value) for key, value in sample_index_dict.items()}
+        sample_count_dict = {k: sample_count_dict[k] for k in [''.join(c) for c in product('ACGT', repeat=kmer_length)]}
         return sample_count_dict
     
     else:
         return sample_index_dict
     
+    
+    
+def normalize_kmer(input_file_path, slice_start, slice_end, kmer):
+    
+    #Normalization of mutation probabilities to whole genome burden
+    ref_dir = abs_path(str(kmer) + "-mer",  "Directory")
+    kmer_ref = (glob.glob(ref_dir+ "/" + str(kmer) +"-mer_chr*"))
+    
+    kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
+    for i in kmer_ref[1:-1]:
+        sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
+        kmer_count = kmer_count.add(sample, fill_value=0)
+          
+    kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)[str(kmer)], kmer_count))
+    
+    normalize_constant = kmer_reference_count_dict.copy()
+    for key in normalize_constant:
+        normalize_constant[key] = normalize_constant[key] * (len(sample) / sum(list( kmer_reference_count_dict.values()))) 
+    
+    sample_count_dict = sequence_index_dict(input_file_path, slice_start, slice_end, kmer_length = kmer, count=True)
+    
+    sample_count_dict = {k: sample_count_dict[k] for k in [''.join(c) for c in product('ACGT', repeat=kmer)]}
+    
+    normalized_sample_count_dict = {k: int(sample_count_dict[k]/normalize_constant[k]) for k in sample_count_dict.keys()}
+            
+    return normalized_sample_count_dict
+    
 
     
 #Cell 3 Loaded
 print("Cell 3 of 5 Loaded")
+
 
 #%%
 
@@ -748,16 +779,19 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, sequence_abs_path, slic
             pass
         
         else:
-            insertion_prob = insertion_df.loc[insertion_df['Size'] == count]
-            insertion_prob = insertion_prob[insertion_prob['Index'] == keys[:count]]['Probability']
+            try:
+                insertion_prob = insertion_df.loc[insertion_df['Size'] == count]
+                insertion_prob = insertion_prob[insertion_prob['Index'] == keys[:count]]['Probability']
+                
+                insertion_count = np.random.binomial(k6mer_count_map[keys], insertion_prob, 1) 
             
-            insertion_count = np.random.binomial(k6mer_count_map[keys], insertion_prob, 1) 
-        
-            for m in range(sum(i_number > 0 for i_number in list(insertion_count))):
-                insertion_index = np.random.choice(sample_index_dict[keys])
-                insertion_dict[insertion_index] = keys[0]
-                gen_insertion_dict[insertion_index] = keys[0]
-                output_insertion_dict[insertion_index] = keys[:count]
+                for m in range(sum(i_number > 0 for i_number in list(insertion_count))):
+                    insertion_index = np.random.choice(sample_index_dict[keys])
+                    insertion_dict[insertion_index] = keys[0]
+                    gen_insertion_dict[insertion_index] = keys[0]
+                    output_insertion_dict[insertion_index] = keys[:count]
+            except:
+                pass
             
             
         #Deletion
@@ -765,47 +799,57 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, sequence_abs_path, slic
             pass
         
         else:
-            deletion_prob = deletion_df.loc[deletion_df['Size'] == count]
-            deletion_prob = deletion_prob[deletion_prob['Index'] == keys[:count]]['Probability']
-            
-            deletion_count = np.random.binomial(k6mer_count_map[keys], deletion_prob, 1) 
-
-            for n in range(sum(d_number > 0 for d_number in list(deletion_count))):
-                deletion_index = np.random.choice(sample_index_dict[keys])
-                deletion_dict[deletion_index] = keys[0]
-                gen_deletion_dict[deletion_index] = keys[0]
-                output_deletion_dict[deletion_index] = keys[:count]
+            try:
+                deletion_prob = deletion_df.loc[deletion_df['Size'] == count]
+                deletion_prob = deletion_prob[deletion_prob['Index'] == keys[:count]]['Probability']
+                
+                deletion_count = np.random.binomial(k6mer_count_map[keys], deletion_prob, 1) 
+    
+                for n in range(sum(d_number > 0 for d_number in list(deletion_count))):
+                    deletion_index = np.random.choice(sample_index_dict[keys])
+                    deletion_dict[deletion_index] = keys[0]
+                    gen_deletion_dict[deletion_index] = keys[0]
+                    output_deletion_dict[deletion_index] = keys[:count]
+            except:
+                pass
     
         #SBS
         if "G" in keys[1] or "A" in keys[1]:
             pass
         
         else:
-            sbs_mutation = sbs_sorted_df[sbs_sorted_df['SubType'] == keys[:3]]['Type'].tolist() + [None]
-            sbs_types = sbs_sorted_df[sbs_sorted_df['SubType'] == keys[:3]]['Probability'].tolist()
-            sbs_prob = sbs_types + [1 - sum(sbs_types)] 
-            
-            sbs = [sbs_num for sbs_num in list(np.random.choice(a=sbs_mutation,p=sbs_prob, size = k6mer_count_map[keys])) if sbs_num]
-            
-            for sbs_value in sbs:
-                single_base_index = np.random.choice(sample_index_dict[keys])
-                sbs_dict[single_base_index] = sbs_value[2]
-                gen_sbs_dict[single_base_index] = sbs_value[2]
-                output_sbs_dict[single_base_index] = [sbs_value, sample_seq[single_base_index:single_base_index+3]]
+            try:
+                sbs_mutation = sbs_sorted_df[sbs_sorted_df['SubType'] == keys[:3]]['Type'].tolist() + [None]
+                sbs_types = sbs_sorted_df[sbs_sorted_df['SubType'] == keys[:3]]['Probability'].tolist()
+                sbs_prob = sbs_types + [1 - sum(sbs_types)] 
+                
+                sbs = [sbs_num for sbs_num in list(np.random.choice(a=sbs_mutation,p=sbs_prob, size = k6mer_count_map[keys])) if sbs_num]
+                
+                for sbs_value in sbs:
+                    single_base_index = np.random.choice(sample_index_dict[keys])
+                    sbs_dict[single_base_index] = sbs_value[2]
+                    gen_sbs_dict[single_base_index] = sbs_value[2]
+                    output_sbs_dict[single_base_index] = [sbs_value, sample_seq[single_base_index:single_base_index+3]]
+            except:
+                pass
                                 
         #DBS   
         if keys[:2] in [x[:2] for x in dbs_sorted_df["Mutation Type"]]:
- 
-            dbs_mutation = dbs_sorted_df[dbs_sorted_df['Context'] == keys[:2]]['Mutation Type'].tolist() + [None]
-            dbs_types = dbs_sorted_df[dbs_sorted_df['Mutation Type'].isin(dbs_mutation)]['Probability'].tolist()
-            dbs_prob = dbs_types + [1 - sum(dbs_types)] 
             
-            dbs = [dbs_num for dbs_num in list(np.random.choice(a=dbs_mutation,p=dbs_prob, size = k6mer_count_map[keys])) if dbs_num]
-            for dbs_value in dbs:
-                double_base_index = np.random.choice(sample_index_dict[keys])
-                dbs_dict[double_base_index] = dbs_value[3:]
-                gen_dbs_dict[double_base_index] = dbs_value[3:]
-                output_dbs_dict[double_base_index] = dbs_value
+            try:
+                dbs_mutation = dbs_sorted_df[dbs_sorted_df['Context'] == keys[:2]]['Mutation Type'].tolist() + [None]
+                dbs_types = dbs_sorted_df[dbs_sorted_df['Mutation Type'].isin(dbs_mutation)]['Probability'].tolist()
+                dbs_prob = dbs_types + [1 - sum(dbs_types)] 
+                
+                dbs = [dbs_num for dbs_num in list(np.random.choice(a=dbs_mutation,p=dbs_prob, size = k6mer_count_map[keys])) if dbs_num]
+                for dbs_value in dbs:
+                    double_base_index = np.random.choice(sample_index_dict[keys])
+                    dbs_dict[double_base_index] = dbs_value[3:]
+                    gen_dbs_dict[double_base_index] = dbs_value[3:]
+                    output_dbs_dict[double_base_index] = dbs_value
+                    
+            except:
+                pass
                 
         else:
             pass
@@ -1424,12 +1468,12 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, sequence_abs_path, slic
     else:
         print ("Successfully created the directory %s " % (seq_directory + "/" + cancer_type))
        
-    # #Write mutated sequence to fasta file
-    # sample_sequence_file = seq_directory + "/" + cancer_type + "/" + cancer_type + '_Lineage_' + str(number_of_lineages) + '.fasta'
-    # with open(sample_sequence_file, 'w+') as fasta_file:
-    #     fasta_file.write(">" + str(cancer_type) + "_Lineage_" + str(number_of_lineages) + "\n")
-    #     fasta_file.write("")
-    #     fasta_file.write(sample_seq)
+    #Write mutated sequence to fasta file
+    sample_sequence_file = seq_directory + "/" + cancer_type + "/" + cancer_type + '_Lineage_' + str(number_of_lineages) + '.fasta'
+    with open(sample_sequence_file, 'w+') as fasta_file:
+        fasta_file.write(">" + str(cancer_type) + "_Lineage_" + str(number_of_lineages) + "\n")
+        fasta_file.write("")
+        fasta_file.write(sample_seq)
         
     #Write SBS mutation frequency tables to csv file
     sbs_freq_path = mut_mat_directory + "/" + cancer_type + '_Lineage_' + str(number_of_lineages)+ '_sbs_freq_table.csv'
@@ -1494,6 +1538,7 @@ def main():
     parser.add_argument("--syn_rate", "-x", help="proportion of synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1)
     parser.add_argument("--non_syn_rate", "-y", help="proportion of non-synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1)
     parser.add_argument("--reference", "-r", help="full file path of reference sequence used as input for the simulation")
+    parser.add_argument("--normalization", "-n", help="full file path of reference sequence used as input for the simulation", default = True)
     
     # Read arguments from the command line
     args = parser.parse_args()
@@ -1507,14 +1552,28 @@ def main():
     
     print("Input reference sequence successfully located and read.")
     
-    #Normalized kmer counts
-    k1mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 1, count=True)
-    k2mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 2, count=True)
-    k3mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 3, count=True)
-    k4mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 4, count=True)
-    k5mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 5, count=True)
-    k6mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 6, count=True)
+    #Normalization
+    normalization = args.normalization
+    
+    if normalization is True:
+        #Normalized kmer counts
+        k1mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 1)
+        k2mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 2)
+        k3mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 3)
+        k4mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 4)
+        k5mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 5)
+        k6mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 6)
+        
+    else:
+        #Non-normalized kmer counts
+        k1mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 1, count=True)
+        k2mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 2, count=True)
+        k3mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 3, count=True)
+        k4mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 4, count=True)
+        k5mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 5, count=True)
+        k6mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 6, count=True)
 
+    #Map positional indices of sequence 
     sample_index_dict = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 6, count=False)
     
     print("K-mer distribution mapped.")
@@ -1524,7 +1583,7 @@ def main():
         for item in cancer_type_list:
 
             iterable = range(1, int(args.generation) + 1)
-            pool = multiprocessing.Pool(2)
+            pool = multiprocessing.Pool(4)
             starttime= time.time()
             
             cancer_type = item
@@ -1547,7 +1606,7 @@ def main():
             print('Cancer type not found in existing types.')
         else:
             iterable = range(1, int(args.generation) + 1)
-            pool = multiprocessing.Pool(2)
+            pool = multiprocessing.Pool(4)
             starttime= time.time()
             
             cancer_type = str(args.cancer)

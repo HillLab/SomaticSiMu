@@ -428,6 +428,30 @@ Arguments:
     else:
         return sample_index_dict
     
+def normalize_kmer(input_file_path, slice_start, slice_end, kmer):
+    
+    #Normalization of mutation probabilities to whole genome burden
+    ref_dir = abs_path(str(kmer) + "-mer",  "Directory")
+    kmer_ref = (glob.glob(ref_dir+ "/" + str(kmer) +"-mer_chr*"))
+    
+    kmer_count = pd.read_csv(kmer_ref[0], index_col=0)['count'].fillna(0)
+    for i in kmer_ref[1:-1]:
+        sample = pd.read_csv(i, index_col=0)['count'].fillna(0)
+        kmer_count = kmer_count.add(sample, fill_value=0)
+          
+    kmer_reference_count_dict = dict(zip(pd.read_csv(kmer_ref[0], index_col=0)[str(kmer)], kmer_count))
+    
+    normalize_constant = kmer_reference_count_dict.copy()
+    for key in normalize_constant:
+        normalize_constant[key] = normalize_constant[key] * (len(sample) / sum(list( kmer_reference_count_dict.values()))) 
+    
+    sample_count_dict = sequence_index_dict(input_file_path, slice_start, slice_end, kmer_length = kmer, count=True)
+    
+    sample_count_dict = {k: sample_count_dict[k] for k in [''.join(c) for c in product('ACGT', repeat=kmer)]}
+    
+    normalized_sample_count_dict = {k: int(sample_count_dict[k]/normalize_constant[k]) for k in sample_count_dict.keys()}
+            
+    return normalized_sample_count_dict
 
     
 #Cell 3 Loaded
@@ -1505,15 +1529,16 @@ def multiprocessing_func( p ):
     sample_seq = seq_slice(sequence_abs_path, slice_start, slice_end)
     
     #Normalized kmer counts
-    k1mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 1, count=True)
-    k2mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 2, count=True)
-    k3mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 3, count=True)
-    k4mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 4, count=True)
-    k5mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 5, count=True)
-    k6mer_count_map = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 6, count=True)
+    
+    k1mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 1)
+    k2mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 2)
+    k3mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 3)
+    k4mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 4)
+    k5mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 5)
+    k6mer_count_map = normalize_kmer(sequence_abs_path, slice_start, slice_end, kmer = 6)
 
     sample_index_dict = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 6, count=False)
-    sample_count_dict = sequence_index_dict(sequence_abs_path, slice_start, slice_end, kmer_length = 6, count=True)
+    
 
     try:
         
