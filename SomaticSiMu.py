@@ -1583,7 +1583,7 @@ def main():
         for item in cancer_type_list:
 
             iterable = range(1, int(args.generation) + 1)
-            pool = multiprocessing.Pool(4)
+            pool = multiprocessing.Pool(multiprocessing.cpu_count())
             starttime= time.time()
             
             cancer_type = item
@@ -1606,7 +1606,7 @@ def main():
             print('Cancer type not found in existing types.')
         else:
             iterable = range(1, int(args.generation) + 1)
-            pool = multiprocessing.Pool(4)
+            pool = multiprocessing.Pool(multiprocessing.cpu_count())
             starttime= time.time()
             
             cancer_type = str(args.cancer)

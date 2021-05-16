@@ -1577,7 +1577,7 @@ def run( *lis):
     else:          
         
         starttime= time.time()
-        pool = multiprocessing.Pool(4)
+        pool = multiprocessing.Pool(multiprocessing.cpu_count())
         
         my_arg  = list ( product( [arg] ,  list( range( int(arg[ 0 ]) ) )  ) )
 
@@ -2146,7 +2146,7 @@ def mut_catalog(cancer_type, gen_start, gen_end, mut_type):
             
             for gen in range(gen_start, gen_end+1):
                 try:
-                    df_read_in = pd.read_csv(abs_path(cancer_type + '__Lineage_' + str(gen) + '_del_freq_table.csv', 'File'))
+                    df_read_in = pd.read_csv(abs_path(cancer_type + '_Lineage_' + str(gen) + '_del_freq_table.csv', 'File'))
                     graph_data[gen] = df_read_in['Frequency']
                 except:
                     print(cancer_type + '_Lineage_' + str(gen) + '_del_freq_table.csv does not exist!')
