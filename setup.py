@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="SomaticSiMu", 
-    version="0.0.1",
+    version="2.0.0",
     author="David Chen",
     author_email="dchen362@uwo.ca",
     description="Mutational Signature Simulation",
@@ -15,11 +15,13 @@ setuptools.setup(
     url="https://github.com/HillLab/SomaticSiMu",
     packages=setuptools.find_packages(),
     classifiers=[
+	"Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Apache Software License",
+        "License :: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+Public License",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.8',
 )
