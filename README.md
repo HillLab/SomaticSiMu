@@ -91,5 +91,4 @@ Please make sure to update tests as appropriate.
 ## License
 Creative Commons Creative Commons Attribution 4.0 International license
 
-## PyPi Hosting
-https://pypi.org/project/SomaticSiMu/0.0.1/
+
