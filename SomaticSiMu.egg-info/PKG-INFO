@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: SomaticSiMu
-Version: 0.0.1
-Summary: A small example package
+Version: 3.0.0
+Summary: Mutational Signature Simulation
 Home-page: https://github.com/HillLab/SomaticSiMu
 Author: David Chen
 Author-email: dchen362@uwo.ca
@@ -38,7 +38,6 @@ Description: # SomaticSiMu
         │   ├── 5-mer
         │   ├── 6-mer
         ├── SomaticSiMu.py
-        ├── SomaticSiMu_CC.py
         ├── SomaticSiMu_CC.py
         ```
         
@@ -98,13 +97,17 @@ Description: # SomaticSiMu
         Please make sure to update tests as appropriate.
         
         ## License
-        Apache License Version 2.0
+        Creative Commons Creative Commons Attribution 4.0 International license
+        
+        ## PyPi Hosting
+        https://pypi.org/project/SomaticSiMu/3.0.0/
         
 Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
 Classifier: Programming Language :: Python :: 3
-Classifier: License :: OSI Approved :: Apache Software License
+Classifier: License :: OSI Approved :: Common Public License
 Classifier: Operating System :: OS Independent
 Classifier: Intended Audience :: Science/Research
 Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
-Requires-Python: >=3.6
+Requires-Python: >=3.8
 Description-Content-Type: text/markdown
