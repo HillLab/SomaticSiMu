@@ -1538,7 +1538,7 @@ def main():
     parser.add_argument("--syn_rate", "-x", help="proportion of synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1)
     parser.add_argument("--non_syn_rate", "-y", help="proportion of non-synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1)
     parser.add_argument("--reference", "-r", help="full file path of reference sequence used as input for the simulation")
-    parser.add_argument("--normalization", "-n", help="full file path of reference sequence used as input for the simulation", default = True)
+    parser.add_argument("--normalization", "-n", help="normalize for reference sequence k-mer composition proportional to Homo Sapiens GChr38 build ", default = False)
     
     # Read arguments from the command line
     args = parser.parse_args()
