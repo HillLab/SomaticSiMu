@@ -90,14 +90,3 @@ Please make sure to update tests as appropriate.
 
 ## License
 Creative Commons Creative Commons Attribution 4.0 International license
-
-<<<<<<< Updated upstream
-
-=======
-<<<<<<< HEAD
-## PyPi Hosting
-https://pypi.org/project/SomaticSiMu/3.0.0/
-=======
-
->>>>>>> 367b7f077599df9dde6f9a75504b38d39233f22e
->>>>>>> Stashed changes
