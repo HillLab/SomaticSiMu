@@ -745,7 +745,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, sequence_abs_path, slic
     output_dbs_dict={}
 
     #Indel mutation probabilities
-    id_sorted_df = indel_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k1mer_count_map, k2mer_count_map, k3mer_count_map, k4mer_count_map, k5mer_count_map, k6mer_count_map,std_outlier=3, power=1)
+    id_sorted_df = indel_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k1mer_count_map, k2mer_count_map, k3mer_count_map, k4mer_count_map, k5mer_count_map, k6mer_count_map,std_outlier=std_outlier, power=power)
 
     deletion_df = id_sorted_df.copy().iloc[:12,:]
     deletion_df['Size'] = [1,2,3,4,5,6,1,2,3,4,5,6]
@@ -755,12 +755,12 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, sequence_abs_path, slic
     print("Insertion and Deletion mutation probability matrix set up.")
     
     #SBS mutation probabilities
-    sbs_sorted_df = sbs_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k3mer_count_map, std_outlier=3, power=1)
+    sbs_sorted_df = sbs_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k3mer_count_map, std_outlier=std_outlier, power=power)
     
     print("Single Base Substitution mutation probability matrix set up.")
    
     #DBS mutation probabilities
-    dbs_sorted_df = dbs_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k2mer_count_map, std_outlier=3, power=1)
+    dbs_sorted_df = dbs_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k2mer_count_map, std_outlier=std_outlier, power=power)
     dbs_sorted_df['Context'] = [x[:2] for x in dbs_sorted_df["Mutation Type"]]
     
     print("Double Base Substitution mutation probability matrix set up.")
