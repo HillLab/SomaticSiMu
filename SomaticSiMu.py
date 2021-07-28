@@ -1613,9 +1613,9 @@ def main():
             reading_frame = int(args.reading_frame)
             std_outlier = int(args.std)
         
-            power = args.power
-            syn_rate = args.syn_rate
-            non_syn_rate = args.non_syn_rate
+            power = int(args.power)
+            syn_rate = float(args.syn_rate)
+            non_syn_rate = float(args.non_syn_rate)
                         
             func = partial(somatic_sim, cancer_type, reading_frame, std_outlier, sequence_abs_path, slice_start, slice_end, power, syn_rate, non_syn_rate, sample_seq, sample_index_dict, k1mer_count_map, k2mer_count_map, k3mer_count_map, k4mer_count_map, k5mer_count_map, k6mer_count_map)
         
