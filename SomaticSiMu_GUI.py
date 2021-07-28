@@ -689,12 +689,12 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, sequence_abs_path, slic
         print("power argument must be int type")
         sys.exit()
         
-    if isinstance(syn_rate, int) == False:
-        print("syn_rate argument must be int type")
+    if isinstance(syn_rate, float) == False:
+        print("syn_rate argument must be float type")
         sys.exit()
         
-    if isinstance(non_syn_rate, int) == False:
-        print("non_syn_rate argument must be int type")
+    if isinstance(non_syn_rate, float) == False:
+        print("non_syn_rate argument must be float type")
         sys.exit()
         
     if sequence_abs_path.split('.')[-1].lower() != "fasta":
@@ -1550,8 +1550,8 @@ def multiprocessing_func( p ):
                 slice_start = arg[5] , 
                 slice_end = arg[6], 
                 power=int(arg[7]) , 
-                syn_rate= int(arg[8]) , 
-                non_syn_rate=int(arg[-1]) ,
+                syn_rate= float(arg[8]) , 
+                non_syn_rate=float(arg[-1]) ,
                 sample_seq=sample_seq, 
                 sample_index_dict=sample_index_dict, 
                 k1mer_count_map=k1mer_count_map, 
