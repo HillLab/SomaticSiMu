@@ -117,8 +117,8 @@ Signature_Combinations: CSV file output of the signature combinations used for e
 
 ## File Structure
 <pre>
-├── Documentation                                          // Images used for documentation of SomaticSiMu-GUI.
-├── Reference                                              // Reference mutational signature datasets used as the baseline for the types and proportions of mutations simulated for each cancer type.
+├── Documentation                                             // Images used for documentation of SomaticSiMu-GUI.
+├── Reference                                                 // Reference mutational signature datasets used as the baseline for the types and proportions of mutations simulated for each cancer type.
 │   └── PCAWG_sigProfiler_DBS_signatures_in_samples.csv
 │   └── PCAWG_sigProfiler_ID_signatures_in_samples.csv
 │   └── PCAWG_sigProfiler_SBS_signatures_in_samples.csv
@@ -127,25 +127,25 @@ Signature_Combinations: CSV file output of the signature combinations used for e
 │   └── sigProfiler_SBS_signatures.csv
 │   └── WGS_PCAWG.96.csv
 │   └── WGS_PCAWG.96.xlsx
-├── Reference_genome                                      // Example reference genomic sequence used for quick start simulations and testing of SomaticSiMu.
+├── Reference_genome                                          // Example reference genomic sequence used for quick start simulations and testing of SomaticSiMu.
 │   └── Homo_sapiens.GRCh38.dna.chromosome.22.fasta
-├── kmer_ref_count                                        // 1-6mer count of GChr38 whole genome for optional normalization step during simulations.
+├── kmer_ref_count                                            // 1-6mer count of GChr38 whole genome for optional normalization step during simulations.
 │   └── 1-mer
 │   └── 2-mer
 │   └── 3-mer
 │   └── 4-mer
 │   └── 5-mer
 │   └── 6-mer
-├── Sample                                                // Output directory for simulated sequences with imposed mutations.
-├── Signature_Combinations                                // Output directory that lists the set of simulated mutational signatures for each simulated sequence.
-├── Mutation_Metadata                                     // Output directory that lists all simulated mutations by the mutation type, index (location in the sequence), and its local sequence context for each simulated sequence.
-├── Frequency_Table                                       // Output directory that summarizes the total count of each mutation type and the possible local sequence contexts based on the SBS-96, DBS-78, or single base indel mutation classification schemes.
-├── SomaticSiMu.py                                        // Simulation script (use in terminal)
-├── SomaticSiMu_GUI.py                                    // Simulation script (graphic user interface)
-├── requirements.txt                                      // SomaticSiMu dependencies
-├── setup.py                                              // Optional automated setup script to download dependencies.
-├── README.md                                             // README file.
-├── LICENSE                                               // Copy of Creative Commons Attribution 4.0 International License.
+├── Sample                                                    // Output directory for simulated sequences with imposed mutations.
+├── Signature_Combinations                                    // Output directory that lists the set of simulated mutational signatures for each simulated sequence.
+├── Mutation_Metadata                                         // Output directory that lists all simulated mutations by the mutation type, index (location in the sequence), and its local sequence context for each simulated sequence.
+├── Frequency_Table                                           // Output directory that summarizes the total count of each mutation type and the possible local sequence contexts based on the SBS-96, DBS-78, or single base indel mutation classification schemes.
+├── SomaticSiMu.py                                            // Simulation script (use in terminal)
+├── SomaticSiMu_GUI.py                                        // Simulation script (graphic user interface)
+├── requirements.txt                                          // SomaticSiMu dependencies
+├── setup.py                                                  // Optional automated setup script to download dependencies.
+├── README.md                                                 // README file.
+├── LICENSE                                                   // Copy of Creative Commons Attribution 4.0 International License.
 </pre>
 
 ## Example Simulated Datasets
@@ -158,6 +158,7 @@ Please make sure to update tests as appropriate.
 
 ## Citing SomaticSiMu
 
+[Chen, D., Randhawa, G.S., Soltysiak, M.P.M., de Souza, C.P.E., Kari, L., Singh, S.M., Hill, K.A. (2021). SomaticSiMu: a mutational signature simulator. bioRxiv.](https://doi.org/10.1101/2021.09.30.462618)
 
 ## License
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
