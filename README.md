@@ -35,7 +35,7 @@ SomaticSiMu is freely available on [GitHub](https://github.com/HillLab/SomaticSi
 Install SomaticSiMu to your working directory using the following command in a terminal.
 
 ```sh
-git clone https://github.com/HillLab/SomaticSiMu\
+git clone https://github.com/HillLab/SomaticSiMu
 ```
 
 
