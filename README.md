@@ -37,19 +37,24 @@ git clone https://github.com/HillLab/SomaticSiMu\
 
 SomaticSiMu requires the absolute file path of a reference genomic sequence on the local machine as input data into the simulation. Users then select the simulation-related parameters (shown below) to specify the cancer type (mutational signatures observed in whole genomes of the selected cancer type), mutation rate, location for simulated mutations, and proportion of synonymous/non-synonymous mutations as part of the simulation.
 
-The same set of arguments are offered for both `SomaticSiMu.py` and `SomaticSiMu_GUI.py`. The main difference is that `SomaticSiMu.py` is run using a terminal interface while `SomaticSiMu_GUI.py` uses a Tkinter graphical user interface to improve user accessibility along with a suite of built-in visualization functions for the simulated output data. 
+The same set of arguments are offered for both `SomaticSiMu.py` and `SomaticSiMu_GUI.py`. The main difference is that `SomaticSiMu.py` is run using a terminal interface while `SomaticSiMu_GUI.py` uses a Tkinter graphical user interface to improve user accessibility along with a suite of built-in visualization functions for the simulated output data. Simulation speed and memory performance is comparable between `SomaticSiMu.py` and `SomaticSiMu_GUI.py`.
 
-To simulate 100 genomic sequences using NC_000022.11![image](https://user-images.githubusercontent.com/57333478/146627061-3ee0406b-c44e-40a3-8dbc-8394edcda868.png)
+### Simulations using SomaticSiMu.py (terminal interface)
 
-
-run `SomaticSiMu.py`, an example command in the terminal would look like this:
+To simulate 100 unique genomic sequences using `NC_000022.11` as the reference input sequence and Skin-Melanoma associated mutational signatures, an example command in the terminal using `SomaticSiMu.py` would look like this:
 
 ```sh
 python SomaticSiMu.py -g 100 -c Skin-Melanoma -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta
 ```
+### Simulations using SomaticSiMu_GUI.py (graphical user interface)
 
+To conduct the same simulation using `SomaticSiMu_GUI.py`, first run: 
+```sh
+python SomaticSiMu_GUI.py 
+```
+Then, select from drop down menus or type in the simulation parameters.
 
-Simulation speed and memory performance is comparable between `SomaticSiMu.py` and `SomaticSiMu_GUI.py`
+### Simulation Parameters
 
 Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Description | Argument Range 
 --- | --- | --- | --- | ---
