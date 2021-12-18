@@ -52,7 +52,7 @@ To conduct the same simulation using `SomaticSiMu_GUI.py`, first run:
 ```sh
 python SomaticSiMu_GUI.py 
 ```
-Then, select from drop down menus or type in the simulation parameters.
+Then, select from drop down menus or type in the simulation parameters. Click on each simulation parameter name on the GUI interface to open up a new tab with a visual representation and description of each parameter.
 
 ### Simulation Parameters
 
@@ -98,7 +98,7 @@ python SomaticSiMu.py -g 100 -c Skin-Melanoma -r ./SomaticSiMu/Reference_genome/
 python SomaticSiMu.py -g 30 -c CNS-Medullo -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -f 2 -x 1 -y 0.5
 ```
 
-#### Simulate 20 sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma. Normalize the simulated mutations such that their types and proportions are comparable to what would be observed at the whole genome level. 
+#### Simulate 20 sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma. Normalize the simulated mutations such that their types and proportions are comparable to what would be observed at the GChr38 whole genome level. 
 
 ```sh
 python SomaticSiMu.py -g 20 -c Kidney-RCC -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -n True
@@ -116,28 +116,39 @@ Signature_Combinations: CSV file output of the signature combinations used for e
 
 
 ## File Structure
-```
-├── DBS_Expected_Frequency
-├── Documentation
-├── Frequency_Table
-├── ID_Expected_Frequency
-├── Mutation_Metadata
-├── Reference
-├── Reference_genome
-├── Sample
-├── Signature_Combinations
-├── kmer_ref_count
-│   ├── 1-mer
-│   ├── 2-mer
-│   ├── 3-mer
-│   ├── 4-mer
-│   ├── 5-mer
-│   ├── 6-mer
-├── SomaticSiMu.py
-├── SomaticSiMu_CC.py
-```
+<pre>
+├── Documentation                                          // Images used for documentation of SomaticSiMu-GUI.
+├── Reference                                              // Reference mutational signature datasets used as the baseline for the types and proportions of mutations simulated for each cancer type.
+│   └── PCAWG_sigProfiler_DBS_signatures_in_samples.csv
+│   └── PCAWG_sigProfiler_ID_signatures_in_samples.csv
+│   └── PCAWG_sigProfiler_SBS_signatures_in_samples.csv
+│   └── sigProfiler_DBS_signatures.csv
+│   └── sigProfiler_ID_signatures.csv
+│   └── sigProfiler_SBS_signatures.csv
+│   └── WGS_PCAWG.96.csv
+│   └── WGS_PCAWG.96.xlsx
+├── Reference_genome                                      // Example reference genomic sequence used for quick start simulations and testing of SomaticSiMu.
+│   └── Homo_sapiens.GRCh38.dna.chromosome.22.fasta
+├── kmer_ref_count                                        // 1-6mer count of GChr38 whole genome for optional normalization step during simulations.
+│   └── 1-mer
+│   └── 2-mer
+│   └── 3-mer
+│   └── 4-mer
+│   └── 5-mer
+│   └── 6-mer
+├── Sample                                                // Output directory for simulated sequences with imposed mutations.
+├── Signature_Combinations                                // Output directory that lists the set of simulated mutational signatures for each simulated sequence.
+├── Mutation_Metadata                                     // Output directory that lists all simulated mutations by the mutation type, index (location in the sequence), and its local sequence context for each simulated sequence.
+├── Frequency_Table                                       // Output directory that summarizes the total count of each mutation type and the possible local sequence contexts based on the SBS-96, DBS-78, or single base indel mutation classification schemes.
+├── SomaticSiMu.py                                        // Simulation script (use in terminal)
+├── SomaticSiMu_GUI.py                                    // Simulation script (graphic user interface)
+├── requirements.txt                                      // SomaticSiMu dependencies
+├── setup.py                                              // Optional automated setup script to download dependencies.
+├── README.md                                             // README file.
+├── LICENSE                                               // Copy of Creative Commons Attribution 4.0 International License.
+</pre>
 
-## File Structure
+## Example Simulated Datasets
 Provided datasets link 
 
 ## Contributing
@@ -145,7 +156,8 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
-## References
+## Citing SomaticSiMu
+
 
 ## License
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
