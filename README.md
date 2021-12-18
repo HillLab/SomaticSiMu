@@ -1,4 +1,4 @@
-# <img src="https://github.com/HillLab/SomaticSiMu/blob/master/Documentation%20/SomaticSiMu_Logo_2.png" alt="Logo" width="600" style="float: right;"/>
+# <img src="https://github.com/HillLab/SomaticSiMu/blob/master/Documentation%20/SomaticSiMu_Logo_2.png" alt="Logo" width="800" style="float: right;"/>
 
 SomaticSiMu generates single and double base pair substitutions, and single base pair insertions and deletions of biologically representative mutation signature probabilities and combinations. SomaticSiMu_GUI is the GUI version of SomaticSiMu.
 
