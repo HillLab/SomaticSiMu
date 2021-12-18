@@ -3,7 +3,9 @@ SomaticSiMu generates single and double base pair substitutions, and single base
 
 ## Description
 
-Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and finetuning model hyperparameters. SomaticSiMu extracts known signature data from reference signature data, generates novel mutations on an input sequence with respect to a series of user-specified parameters, and outputs the simulated mutated sequence as a machine readable FASTA file and metadata about the position, frequency and local sequence context of each mutation. The simulation can also model temporal directed evolution across early and late stages of 37 cancer types. SomaticSiMu is developed as a lightweight, stand alone, and massively parallel software tool with a graphical user interface, built in documentation and visualization functions of mutation signature plots. The rich selection of input parameters and graphical user interface make SomaticSiMu both an easy to use application and effective as part of a wide range of experimental scenarios.  
+Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and finetuning model hyperparameters. SomaticSiMu extracts known signature data from reference signature data, generates novel mutations on an input sequence with respect to a series of user-specified parameters, and outputs the simulated mutated sequence as a machine readable FASTA file and metadata about the position, frequency and local sequence context of each mutation. 
+
+SomaticSiMu is developed as a lightweight, stand alone, and parallel software tool with a graphical user interface, built in documentation and visualization functions of mutation signature plots. The rich selection of input parameters and graphical user interface make SomaticSiMu both an easy to use application and effective as part of a wide range of experimental scenarios.  
 
 ## Requirements 
 
@@ -23,7 +25,7 @@ pip install -r /path/to/requirements.txt
 
 ## Installation
 
-J-statistic is freely available on [GitHub](https://github.com/HillLab/SomaticSiMu). Installation requires [git](https://git-scm.com/) and [git lfs](https://git-lfs.github.com/) installed. 
+SomaticSiMu is freely available on [GitHub](https://github.com/HillLab/SomaticSiMu). Installation requires [git](https://git-scm.com/) and [git lfs](https://git-lfs.github.com/) installed. 
 
 Install SomaticSiMu to your working directory using the following command in a terminal.
 
@@ -32,12 +34,12 @@ git clone https://github.com/HillLab/SomaticSiMu\
 ```
 
 ## Usage
-Parameters as table 
-Range of each parameter (cancer types)
 
+SomaticSiMu requires the absolute file path of a reference genomic sequence on the local machine as input data into the simulation. Users then select the simulation-related parameters to specify the cancer type (mutational signatures observed in whole genomes of the selected cancer type), mutation rate, location for simulated mutations, and proportion of synonymous/non-synonymous mutations as part of the simulation.
 
 Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Description | Argument Range 
-
+--- | --- | --- | --- | ---
+-g | --generation | Integer | Number of simulated sequences | Default = 10 ; Recommended Range: 1-100
 
 ```python
 "--generation", "-g", help="number of simulated sequences", default=10
