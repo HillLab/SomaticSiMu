@@ -3,9 +3,9 @@ SomaticSiMu generates single and double base pair substitutions, and single base
 
 ## Description
 
-Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and finetuning model hyperparameters. SomaticSiMu extracts known signature data from reference signature data, generates novel mutations on an input sequence with respect to a series of user-specified parameters, and outputs the simulated mutated sequence as a machine readable FASTA file and metadata about the position, frequency and local sequence context of each mutation. 
+Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and mutational signature extraction tools from mutational catalogs. SomaticSiMu extracts known signature data from reference signature data of 2,780 whole cancer genomes from the [Pan-Cancer Analysis of Whole Genomes (PCAWG) 2020 database](https://www.nature.com/articles/s41586-020-1943-3), generates novel mutations on an input reference sequence that faithfully simulate real mutational signatures, and outputs the simulated mutated DNA sequence as a machine readable FASTA file and metadata in CSV files about the position, frequency and local trinucleotide sequence context of each mutation. 
 
-SomaticSiMu is developed as a lightweight, stand alone, and parallel software tool with a graphical user interface, built in documentation and visualization functions of mutation signature plots. The rich selection of input parameters and graphical user interface make SomaticSiMu both an easy to use application and effective as part of a wide range of experimental scenarios.  
+SomaticSiMu is developed as a lightweight, stand alone, and parallel software tool with an optional graphical user interface, built in documentation, and visualization functions of mutation signature plots. The rich selection of input parameters and graphical user interface make SomaticSiMu both an easy to use application and effective as part of a wide range of experimental scenarios.  
 
 ## Requirements 
 
@@ -35,7 +35,21 @@ git clone https://github.com/HillLab/SomaticSiMu\
 
 ## Usage
 
-SomaticSiMu requires the absolute file path of a reference genomic sequence on the local machine as input data into the simulation. Users then select the simulation-related parameters to specify the cancer type (mutational signatures observed in whole genomes of the selected cancer type), mutation rate, location for simulated mutations, and proportion of synonymous/non-synonymous mutations as part of the simulation.
+SomaticSiMu requires the absolute file path of a reference genomic sequence on the local machine as input data into the simulation. Users then select the simulation-related parameters (shown below) to specify the cancer type (mutational signatures observed in whole genomes of the selected cancer type), mutation rate, location for simulated mutations, and proportion of synonymous/non-synonymous mutations as part of the simulation.
+
+The same set of arguments are offered for both `SomaticSiMu.py` and `SomaticSiMu_GUI.py`. The main difference is that `SomaticSiMu.py` is run using a terminal interface while `SomaticSiMu_GUI.py` uses a Tkinter graphical user interface to improve user accessibility along with a suite of built-in visualization functions for the simulated output data. 
+
+To simulate 100 genomic sequences using NC_000022.11![image](https://user-images.githubusercontent.com/57333478/146627061-3ee0406b-c44e-40a3-8dbc-8394edcda868.png)
+
+
+run `SomaticSiMu.py`, an example command in the terminal would look like this:
+
+```sh
+python SomaticSiMu.py -g 100 -c Skin-Melanoma -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta
+```
+
+
+Simulation speed and memory performance is comparable between `SomaticSiMu.py` and `SomaticSiMu_GUI.py`
 
 Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Description | Argument Range 
 --- | --- | --- | --- | ---
@@ -49,23 +63,11 @@ Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Desc
 -x | --syn_rate | Float | Proportion of synonymous mutations out of all simulated mutations kept in the output simulated sequence | Default = 1 (keep all syn. mutations) ; Recommended Range: 0 (0% of syn mutations)-1 (100% of syn mutations)
 -y | --non_syn_rate | Float | Proportion of non-synonymous mutations out of all simulated mutations kept in the output simulated sequence | Default = 1 (keep all non-syn. mutations) ; Recommended Range: 0 (0% of non-syn. mutations)-1 (100% of non-syn. mutations)
 -r | --reference | Character | Absolute file path of reference sequence used as input for the simulation | 
--n | --normalization | Normalize mutation rates to simulate mutation types and proportions similar to the Homo Sapiens GChr38 whole genome. Different input reference sequences have different k-mer compositions compared to the whole genome that may impact the simulation of specific mutation types and their proportions.
-
-```python
-"--generation", "-g", help="number of simulated sequences", default=10
-"--cancer", "-c", help="cancer type"
-"--reading_frame", "-f", help="index start of reading frame", default=1
-"--std", "-s", help="exclude signature data outside of n std from the mean", default=3
-"--simulation_type", "-v", help="simulation type", default="end"
-"--slice_start", "-a", help="start of the slice of the input sequence, default=None (start at first base)"
-"--slice_end", "-b", help="end of the slice of the input sequence, default=None (end at first base)"
-"--power", "-p", help="multiplier of mutation burden from burden observed in in vivo samples", default=1
-"--syn_rate", "-x", help="proportion of synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1
-"--non_syn_rate", "-y", help="proportion of non-synonymous mutations out of all simulated mutations kept in the output simulated sequence", default=1
-"--reference", "-r", help="full file path of reference sequence used as input for the simulation"
-```
+-n | --normalization | Character | Normalize mutation rates to simulate mutation types and proportions similar to the Homo Sapiens GChr38 whole genome. Different input reference sequences have different k-mer compositions compared to the whole genome that may impact the simulation of specific mutation types and their proportions. | Options: True, False
 
 ## Quick Start
+
+
 
 Difference between GUI and non-GUI version
 
