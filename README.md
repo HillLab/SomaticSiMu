@@ -74,25 +74,35 @@ Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Desc
 
 The following quick-start examples use `SomaticSiMu.py` in a terminal interface to conduct simulation of mutational signatures. Arguments that are kept as their default value as listed in the Simulaton Parameters table are not shown for readability.
 
-### Simulate 10 sequences with imposed mutational signatures associated with Biliary Adenocarcinoma. Exclude hypermutants with a mutational burden that is one standard deviation beyond the mean mutational burden of the selected cancer type.
+#### Simulate 10 sequences with imposed mutational signatures associated with Biliary Adenocarcinoma. Exclude hypermutants with a mutational burden that is one standard deviation beyond the mean mutational burden of the selected cancer type.
 
+```sh
 python SomaticSiMu.py -g 10 -c Biliary-AdenoCA -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -s 1
+```
 
-### Simulate 50 sequences with imposed mutational signatures associated with Colorectal Adenocarcinoma. Only simulate mutations from base index 10,000,000 to 30,000,000. 
+#### Simulate 50 sequences with imposed mutational signatures associated with Colorectal Adenocarcinoma. Only simulate mutations from base index 10,000,000 to 30,000,000. 
 
+```sh
 python SomaticSiMu.py -g 50 -c ColoRect-AdenoCA -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -a 10000000 -b 30000000
+```
 
-### Simulate 100 sequences with imposed mutational signatures associated with Skin Melanoma. Increase mutation rate three-fold higher than what is observed in real tumors.
+#### Simulate 100 sequences with imposed mutational signatures associated with Skin Melanoma. Increase mutation rate three-fold higher than what is observed in real tumors.
 
+```sh
 python SomaticSiMu.py -g 100 -c Skin-Melanoma -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -p 3 
+```
 
-### Simulate 30 sequences with imposed mutational signatures associated with CNS Medulloblastoma. Treat the entire input sequence as an exon. Reading frame starts at the second base of the sequence (1-start). Keep 100% of the simulated synonymous mutations. Keep 50% of the simulated non-synonymous mutations, with the other 50% randomly excluded and not present in the final output sequence.
+#### Simulate 30 sequences with imposed mutational signatures associated with CNS Medulloblastoma. Treat the entire input sequence as an exon. Reading frame starts at the second base of the sequence (1-start). Keep 100% of the simulated synonymous mutations. Keep 50% of the simulated non-synonymous mutations, with the other 50% randomly excluded and not present in the final output sequence.
 
+```sh
 python SomaticSiMu.py -g 30 -c CNS-Medullo -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -f 2 -x 1 -y 0.5
+```
 
-### Simulate 20 sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma. Normalize the simulated mutations such that their types and proportions are comparable to what would be observed at the whole genome level. 
+#### Simulate 20 sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma. Normalize the simulated mutations such that their types and proportions are comparable to what would be observed at the whole genome level. 
 
+```sh
 python SomaticSiMu.py -g 20 -c Kidney-RCC -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -n True
+```
 
 ## Output 
 
