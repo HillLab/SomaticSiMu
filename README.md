@@ -160,6 +160,13 @@ Signature_Combinations: CSV file output of the signature combinations used for e
 ## Example Simulated Datasets
 SomaticSiMu provides four simulated datasets. All datasets were simulated using SomaticSiMu with Chromosome 22 from the Genome Reference Consortium Human Build 38 (NCBI accession: NC_000022.11) as the input reference sequence. All simulated datasets were produced on a Macbook Pro A2141 using 8 cores of an Intel Core i9 9880H processor and 16GB DDR4 2667MHz SDRAM. Datasets are open source under the CC 4.0 License and can be downloaded at https://doi.org/10.5281/zenodo.5006275.
 
+Dataset ID | Cancer Type | Number of Sequences | Time for Simulation (seconds)
+--- | --- | --- | --- 
+1 | Colorectal Adenocarcinoma | 20 | 668
+2 | Esophageal Adenocarcinoma | 20 | 155
+3 | Lung Adenocarcinoma | 20 | 229
+4 | Skin-Melanoma | 20 | 357
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
