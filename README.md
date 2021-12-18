@@ -61,42 +61,38 @@ Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Desc
 -g | --generation | Integer | Number of simulated sequences | Default = 10 ; Recommended Range: 1-100
 -c | --cancer | Character | Simulated mutational signatures observed in whole genomes of the selected cancer type from PCAWG | Options: Bladder-TCC, Bone-Benign, Bone-Epith, Bone-Osteosarc, Breast-AdenoCA, Breast-DCIS, Breast-LobularCA, CNS-GBM, CNS-Medullo, CNS-Oligo, CNS-PiloAstro, Cervix-AdenoCA, Cervix-SCC, ColoRect-AdenoCA, Eso-AdenoCA, Head-SCC, Kidney-ChRCC, Kidney-RCC, Liver-HCC, Lung-AdenoCA, Lung-SCC, Lymph-BNHL, Lymph-CLL, Myeloid-AML, Myeloid-MDS, Myeloid-MPN, Ovary-AdenoCA, Panc-AdenoCA, Panc-Endocrine, Prost-AdenoCA, SKin-Melanoma, SoftTissue-Leiomyo, SoftTissue-Liposarc, Stomach-AdenoCA, Thy-AdenoCA, Uterus-AdenoCA
 -f | --reading_frame | Integer | Index (1-start) of first base of the first codon in reading frame | Default = 1; Options: 1, 2, 3
--s | --std | Integer | Exclude mutational signature data from hypermutated tumors with a mutational burden `s` standard deviations from the mean mutational burden of the selected cancer type | Default = 3; Recommended Range: 0-3
+-s | --std | Integer | Exclude mutational signature data from hypermutated tumors with a mutational burden `s` standard deviations from the mean mutational burden of the selected cancer type in the PCAWG dataset | Default = 3; Recommended Range: 0-3
 -a | --slice_start | Character/Integer | Simulate mutations starting from this base index (1-start) in the reference sequence | Default = all (simulate mutations anywhere in the reference sequence), Options: Any integer from 1 up to the length of the input reference sequence
 -b | --slice_end | Character/Integer | Simulate mutations starting from the slice_start index in the reference sequence up to and including this base index (1-start) |  Default = all (simulate mutations anywhere in the reference sequence), Options: Any integer greater than slice_start and up to the length of the input reference sequence
--p | --power | Integer | Multiply simulation mutation rate (baseline based on PCAWG whole genomes) by a scalar factor | Default = 1 (biologically representative) ; Recommended Range: 0.1-10
+-p | --power | Integer | Multiply simulation mutation rate (baseline based on PCAWG dataset) by a scalar factor | Default = 1 (biologically representative) ; Recommended Range: 0.1-10
 -x | --syn_rate | Float | Proportion of synonymous mutations out of all simulated mutations kept in the output simulated sequence | Default = 1 (keep all syn. mutations) ; Recommended Range: 0 (0% of syn mutations)-1 (100% of syn mutations)
 -y | --non_syn_rate | Float | Proportion of non-synonymous mutations out of all simulated mutations kept in the output simulated sequence | Default = 1 (keep all non-syn. mutations) ; Recommended Range: 0 (0% of non-syn. mutations)-1 (100% of non-syn. mutations)
 -r | --reference | Character | Absolute file path of reference sequence used as input for the simulation | 
--n | --normalization | Character | Normalize mutation rates to simulate mutation types and proportions similar to the Homo Sapiens GChr38 whole genome. Different input reference sequences have different k-mer compositions compared to the whole genome that may impact the simulation of specific mutation types and their proportions. | Options: True, False
+-n | --normalization | Character | Normalize mutation rates to simulate mutation types and proportions similar to the Homo Sapiens GChr38 whole genome. Different input reference sequences have different k-mer compositions compared to the whole genome that may impact the simulation of specific mutation types and their proportions. | Default: False ; Options: True, False
 
 ## Quick Start
 
+The following quick-start examples use `SomaticSiMu.py` in a terminal interface to conduct simulation of mutational signatures. Arguments that are kept as their default value as listed in the Simulaton Parameters table are not shown for readability.
 
+### Simulate 10 sequences with imposed mutational signatures associated with Biliary Adenocarcinoma. Exclude hypermutants with a mutational burden that is one standard deviation beyond the mean mutational burden of the selected cancer type.
 
-Difference between GUI and non-GUI version
+python SomaticSiMu.py -g 10 -c Biliary-AdenoCA -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -s 1
 
+### Simulate 50 sequences with imposed mutational signatures associated with Colorectal Adenocarcinoma. Only simulate mutations from base index 10,000,000 to 30,000,000. 
 
-Simulate 100 sequences by imposing known mutation signatures associated with Biliary-AdenoCA onto the entire length of reference Human chromosome 22. 
+python SomaticSiMu.py -g 50 -c ColoRect-AdenoCA -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -a 10000000 -b 30000000
 
-```python
-cd SomaticSiMu
+### Simulate 100 sequences with imposed mutational signatures associated with Skin Melanoma. Increase mutation rate three-fold higher than what is observed in real tumors.
 
-python SomaticSiMu_GUI.py
+python SomaticSiMu.py -g 100 -c Skin-Melanoma -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -p 3 
 
-Input Simulation Parameters: 
-cancer_type = Biliary-AdenoCA
-reading_frame = 1
-std_outlier = 3
-number_of_lineages = 100
-simulation_type = end
-sequence_abs_path = Homo_sapiens.GRCh38.dna.chromosome.22.fasta
-slice_start = 0
-slice_end = 50818467
-power=1
-syn_rate=1
-non_syn_rate=1
-```
+### Simulate 30 sequences with imposed mutational signatures associated with CNS Medulloblastoma. Treat the entire input sequence as an exon. Reading frame starts at the second base of the sequence (1-start). Keep 100% of the simulated synonymous mutations. Keep 50% of the simulated non-synonymous mutations, with the other 50% randomly excluded and not present in the final output sequence.
+
+python SomaticSiMu.py -g 30 -c CNS-Medullo -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -f 2 -x 1 -y 0.5
+
+### Simulate 20 sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma. Normalize the simulated mutations such that their types and proportions are comparable to what would be observed at the whole genome level. 
+
+python SomaticSiMu.py -g 20 -c Kidney-RCC -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -n True
 
 ## Output 
 
