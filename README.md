@@ -1,6 +1,7 @@
 # SomaticSiMu
 SomaticSiMu generates single and double base pair substitutions, and single base pair insertions and deletions of biologically representative mutation signature probabilities and combinations. SomaticSiMu_GUI is the GUI version of SomaticSiMu.
 
+
 ## Description
 
 Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and mutational signature extraction tools from mutational catalogs. SomaticSiMu extracts known signature data from reference signature data of 2,780 whole cancer genomes from the [Pan-Cancer Analysis of Whole Genomes (PCAWG) 2020 database](https://www.nature.com/articles/s41586-020-1943-3), generates novel mutations on an input reference sequence that faithfully simulate real mutational signatures, and outputs the simulated mutated DNA sequence as a machine readable FASTA file and metadata in CSV files about the position, frequency and local trinucleotide sequence context of each mutation. 
@@ -23,6 +24,7 @@ Install the dependencies of SomaticSiMu to your working environment using the fo
 pip install -r ./SomaticSiMu/requirements.txt
 ```
 
+
 ## Installation
 
 SomaticSiMu is freely available on [GitHub](https://github.com/HillLab/SomaticSiMu). Installation requires [git](https://git-scm.com/) and [git lfs](https://git-lfs.github.com/) installed. 
@@ -32,6 +34,7 @@ Install SomaticSiMu to your working directory using the following command in a t
 ```sh
 git clone https://github.com/HillLab/SomaticSiMu\
 ```
+
 
 ## Usage
 
@@ -56,7 +59,7 @@ Then, select from drop down menus or type in the simulation parameters. Click on
 
 ### Simulation Parameters
 
-Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Description | Argument Range 
+Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Description | Argument Options
 --- | --- | --- | --- | ---
 -g | --generation | Integer | Number of simulated sequences | Default = 10 ; Recommended Range: 1-100
 -c | --cancer | Character | Simulated mutational signatures observed in whole genomes of the selected cancer type from PCAWG | Options: Bladder-TCC, Bone-Benign, Bone-Epith, Bone-Osteosarc, Breast-AdenoCA, Breast-DCIS, Breast-LobularCA, CNS-GBM, CNS-Medullo, CNS-Oligo, CNS-PiloAstro, Cervix-AdenoCA, Cervix-SCC, ColoRect-AdenoCA, Eso-AdenoCA, Head-SCC, Kidney-ChRCC, Kidney-RCC, Liver-HCC, Lung-AdenoCA, Lung-SCC, Lymph-BNHL, Lymph-CLL, Myeloid-AML, Myeloid-MDS, Myeloid-MPN, Ovary-AdenoCA, Panc-AdenoCA, Panc-Endocrine, Prost-AdenoCA, SKin-Melanoma, SoftTissue-Leiomyo, SoftTissue-Liposarc, Stomach-AdenoCA, Thy-AdenoCA, Uterus-AdenoCA
@@ -70,58 +73,81 @@ Short-Form Argument Name| Long-Form Argument Name| Argument Type | Argument Desc
 -r | --reference | Character | Absolute file path of reference sequence used as input for the simulation | 
 -n | --normalization | Character | Normalize mutation rates to simulate mutation types and proportions similar to the Homo Sapiens GChr38 whole genome. Different input reference sequences have different k-mer compositions compared to the whole genome that may impact the simulation of specific mutation types and their proportions. | Default: False ; Options: True, False
 
+
+### Visualizations using SomaticSiMu_GUI.py (graphical user interface)
+
+Using the SomaticSiMu graphical user interface, built-in visualization functions can plot the mutations types/proportion as well as the total count of simulated mutations. These visualization functions work if the simulation has completed successfully.
+
+Argument Name | Argument Type | Description | Argument Options
+--- | --- | --- | ---
+Cancer Type | Character (Drop Down Menu) | Simulated Cancer Type | Options: Bladder-TCC, Bone-Benign, Bone-Epith, Bone-Osteosarc, Breast-AdenoCA, Breast-DCIS, Breast-LobularCA, CNS-GBM, CNS-Medullo, CNS-Oligo, CNS-PiloAstro, Cervix-AdenoCA, Cervix-SCC, ColoRect-AdenoCA, Eso-AdenoCA, Head-SCC, Kidney-ChRCC, Kidney-RCC, Liver-HCC, Lung-AdenoCA, Lung-SCC, Lymph-BNHL, Lymph-CLL, Myeloid-AML, Myeloid-MDS, Myeloid-MPN, Ovary-AdenoCA, Panc-AdenoCA, Panc-Endocrine, Prost-AdenoCA, SKin-Melanoma, SoftTissue-Leiomyo, SoftTissue-Liposarc, Stomach-AdenoCA, Thy-AdenoCA, Uterus-AdenoCA
+Gen Start | Integer | Unique ID of the first simulated sequence in the range to plot | Default: 1
+Gen End | Integer | Unique ID of the last simulated sequence in the range to plot | Default: Number of sequences simulated for the selected cancer type.
+Mut Type | Character (Drop Down Menu) | Type of plot to visualize| Options: SBS, DBS, Insertion, Deletion, Mutation Burden 
+Visualization Type | Character (Drop Down Menu) | Visualize all simulated mutations | Default: End
+
+
 ## Quick Start
 
-The following quick-start examples use `SomaticSiMu.py` in a terminal interface to conduct simulation of mutational signatures. Arguments that are kept as their default value as listed in the Simulaton Parameters table are not shown for readability.
+The following quick-start examples use `SomaticSiMu.py` in a terminal interface to conduct simulation of mutational signatures and the `SomaticSiMu_GUI.py` graphica user interface to visualize simulated data. Arguments that are kept as their default value as listed in the Simulaton Parameters table are not shown for readability.
 
-#### Simulate 10 sequences with imposed mutational signatures associated with Biliary Adenocarcinoma. Exclude hypermutants with a mutational burden that is one standard deviation beyond the mean mutational burden of the selected cancer type.
+#### Example 1: Simulate 10 sequences with imposed mutational signatures associated with Biliary Adenocarcinoma. Exclude hypermutants with a mutational burden that is one standard deviation beyond the mean mutational burden of the selected cancer type.
 
 ```sh
 python SomaticSiMu.py -g 10 -c Biliary-AdenoCA -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -s 1
 ```
 
-#### Simulate 50 sequences with imposed mutational signatures associated with Colorectal Adenocarcinoma. Only simulate mutations from base index 10,000,000 to 30,000,000. 
+#### Example 2: Simulate 50 sequences with imposed mutational signatures associated with Colorectal Adenocarcinoma. Only simulate mutations from base index 10,000,000 to 30,000,000. 
 
 ```sh
 python SomaticSiMu.py -g 50 -c ColoRect-AdenoCA -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -a 10000000 -b 30000000
 ```
 
-#### Simulate 100 sequences with imposed mutational signatures associated with Skin Melanoma. Increase mutation rate three-fold higher than what is observed in real tumors.
+#### Example 3: Simulate 100 sequences with imposed mutational signatures associated with Skin Melanoma. Increase mutation rate three-fold higher than what is observed in real tumors.
 
 ```sh
 python SomaticSiMu.py -g 100 -c Skin-Melanoma -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -p 3 
 ```
 
-#### Simulate 30 sequences with imposed mutational signatures associated with CNS Medulloblastoma. Treat the entire input sequence as an exon. Reading frame starts at the second base of the sequence (1-start). Keep 100% of the simulated synonymous mutations. Keep 50% of the simulated non-synonymous mutations, with the other 50% randomly excluded and not present in the final output sequence.
+#### Example 4: Simulate 30 sequences with imposed mutational signatures associated with CNS Medulloblastoma. Treat the entire input sequence as an exon. Reading frame starts at the second base of the sequence (1-start). Keep 100% of the simulated synonymous mutations. Keep 50% of the simulated non-synonymous mutations, with the other 50% randomly excluded and not present in the final output sequence.
 
 ```sh
 python SomaticSiMu.py -g 30 -c CNS-Medullo -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -f 2 -x 1 -y 0.5
 ```
 
-#### Simulate 20 sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma. Normalize the simulated mutations such that their types and proportions are comparable to what would be observed at the GChr38 whole genome level. 
+#### Example 5: Simulate 20 sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma. Normalize the simulated mutations such that their types and proportions are comparable to what would be observed at the GChr38 whole genome level. 
 
 ```sh
 python SomaticSiMu.py -g 20 -c Kidney-RCC -r ./SomaticSiMu/Reference_genome/Homo_sapiens.GRCh38.dna.chromosome.22.fasta -n True
 ```
 
-## Output 
+#### Example 6: Using SomaticSiMu-GUI, visualize the mean proportions of each SBS mutation (based on the SBS-96 mutation classification scheme) of the 20 simulated sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma from Example 5.
+
+```sh
+python SomaticSiMu_GUI.py
+```
+
+Input the following parameters into the Visualization menu of the graphical user interface.
+
+```sh
+Cancer Type: Kidney-RCC
+Gen Start: 1
+Gen End: 20
+Mut Type: SBS
+Visualization Type: End
+```
+Visualization will open automatically in a new tab.
+
+
+## Summary of Output Directories
+
+
 Output Directory Name | Description | Use Case
 --- | --- | --- 
 Sample | Simulated sequences output into a subdirectory named after the type of cancer simulated within the Sample Directory. | Simulated FASTA sequences to test the accuracy performance of machine learning-based DNA sequence classifiers such as [Machine Learning with Digital Signal Processing](https://doi.org/10.1093/bioinformatics/btz918)
 Mutation_Metadata | CSV file output of each mutation simulated; the mutation type and index location on the reference input sequence. One file for each simulated sequence. | Identify type and exact location of each simulated mutation referenced by index of the input sequence for each simulated sequence.
 Frequency_Table | CSV file output of summarized counts of each mutation type and local context. One file for each simulated sequence. | Count of each simulated 96-type SBS mutation, 78-type DBS mutation, and 12-type single base indels for each simulated sequence. Used as input into signature extraction tools, such as [SigProfilerExtractor](https://doi.org/10.1101/2020.12.13.422570), to test signature extraction accuracy and precision.
 Signature_Combinations | CSV file output of the signature combinations used for each iteration of the simulation. Different combinations of signatures are found operative in the same cancer type and are incorporated into the simulation. One file for each cancer type simulated. | Identify combinations of known SBS, DBS, and ID signatures used to model the simulated mutations for each simulated sequence with imposed cancer-associated mutational signatures. Used as the ground truth set of simulated mutational signatures to compare with the results from signature extraction tools. 
-
-
-
-
-Sample: Simulated sequences output into directory named after the type of cancer simulated.
-
-Mutation_Metadata: CSV file output of each mutation simulated; the mutation type and index location on the reference input sequence. One file for each simulated sequence. 
-
-Frequency_Table: CSV file output of summarized counts of each mutation type and local context. One file for each simulated sequence. 
-
-Signature_Combinations: CSV file output of the signature combinations used for each iteration of the simulation. Different combinations of signatures are found operative in the same cancer type and are incorporated into the simulation. One file for each cancer type simulated. 
 
 
 ## File Structure
@@ -157,6 +183,7 @@ Signature_Combinations: CSV file output of the signature combinations used for e
 ├── LICENSE                                                   // Copy of Creative Commons Attribution 4.0 International License.
 </pre>
 
+
 ## Example Simulated Datasets
 SomaticSiMu provides four simulated datasets. All datasets were simulated using SomaticSiMu with Chromosome 22 from the Genome Reference Consortium Human Build 38 (NCBI accession: NC_000022.11) as the input reference sequence. All simulated datasets were produced on a Macbook Pro A2141 using 8 cores of an Intel Core i9 9880H processor and 16GB DDR4 2667MHz SDRAM. Datasets are open source under the CC 4.0 License and can be downloaded at https://doi.org/10.5281/zenodo.5006275.
 
@@ -167,14 +194,15 @@ Dataset ID | Cancer Type | Number of Sequences | Time for Simulation (seconds)
 3 | Lung Adenocarcinoma | 20 | 229
 4 | Skin-Melanoma | 20 | 357
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Please make sure to update tests as appropriate.
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.Please make sure to update tests as appropriate.
+
 
 ## Citing SomaticSiMu
 
 [Chen, D., Randhawa, G.S., Soltysiak, M.P.M., de Souza, C.P.E., Kari, L., Singh, S.M., Hill, K.A. (2021). SomaticSiMu: a mutational signature simulator. bioRxiv.](https://doi.org/10.1101/2021.09.30.462618)
+
 
 ## License
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
