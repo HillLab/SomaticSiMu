@@ -1,8 +1,0 @@
-LICENSE
-README.md
-setup.py
-SomaticSiMu.egg-info/PKG-INFO
-SomaticSiMu.egg-info/SOURCES.txt
-SomaticSiMu.egg-info/dependency_links.txt
-SomaticSiMu.egg-info/requires.txt
-SomaticSiMu.egg-info/top_level.txt
