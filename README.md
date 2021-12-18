@@ -105,6 +105,15 @@ python SomaticSiMu.py -g 20 -c Kidney-RCC -r ./SomaticSiMu/Reference_genome/Homo
 ```
 
 ## Output 
+Output Directory Name | Description | Use Case
+--- | --- | --- 
+Sample | Simulated sequences output into a subdirectory named after the type of cancer simulated within the Sample Directory. | Simulated FASTA sequences to test the accuracy performance of machine learning-based DNA sequence classifiers such as [Machine Learning with Digital Signal Processing](https://doi.org/10.1093/bioinformatics/btz918)
+Mutation_Metadata | CSV file output of each mutation simulated; the mutation type and index location on the reference input sequence. One file for each simulated sequence. | Identify type and exact location of each simulated mutation referenced by index of the input sequence for each simulated sequence.
+Frequency_Table | CSV file output of summarized counts of each mutation type and local context. One file for each simulated sequence. | Count of each simulated 96-type SBS mutation, 78-type DBS mutation, and 12-type single base indels for each simulated sequence. Used as input into signature extraction tools, such as [SigProfilerExtractor](https://doi.org/10.1101/2020.12.13.422570), to test signature extraction accuracy and precision.
+Signature_Combinations | CSV file output of the signature combinations used for each iteration of the simulation. Different combinations of signatures are found operative in the same cancer type and are incorporated into the simulation. One file for each cancer type simulated. | Identify combinations of known SBS, DBS, and ID signatures used to model the simulated mutations for each simulated sequence with imposed cancer-associated mutational signatures. Used as the ground truth set of simulated mutational signatures to compare with the results from signature extraction tools. 
+
+
+
 
 Sample: Simulated sequences output into directory named after the type of cancer simulated.
 
