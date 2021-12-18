@@ -124,6 +124,8 @@ python SomaticSiMu.py -g 20 -c Kidney-RCC -r ./SomaticSiMu/Reference_genome/Homo
 
 #### Example 6: Using SomaticSiMu-GUI, visualize the mean proportions of each SBS mutation (based on the SBS-96 mutation classification scheme) of the 20 simulated sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma from Example 5.
 
+Load the SomaticSiMu graphical user interface with the following command in terminal.
+
 ```sh
 python SomaticSiMu_GUI.py
 ```
