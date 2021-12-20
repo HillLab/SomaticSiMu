@@ -1,11 +1,13 @@
-# <img src="https://github.com/HillLab/SomaticSiMu/blob/master/Documentation%20/SomaticSiMu_Logo_2.png" alt="Logo" width="800" style="float: right;"/>
+[![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
+
+# <img src="https://github.com/HillLab/SomaticSiMu/blob/master/Documentation%20/SomaticSiMu_Logo.png" alt="Logo" width="800" style="float: right;"/>
 
 SomaticSiMu generates single and double base pair substitutions, and single base pair insertions and deletions of biologically representative mutation signature probabilities and combinations. SomaticSiMu_GUI is the GUI version of SomaticSiMu.
 
 
 ## Description
 
-Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and mutational signature extraction tools from mutational catalogs. SomaticSiMu extracts known signature data from reference signature data of 2,780 whole cancer genomes from the [Pan-Cancer Analysis of Whole Genomes (PCAWG) 2020 database](https://www.nature.com/articles/s41586-020-1943-3), generates novel mutations on an input reference sequence that faithfully simulate real mutational signatures, and outputs the simulated mutated DNA sequence as a machine readable FASTA file and metadata in CSV files about the position, frequency and local trinucleotide sequence context of each mutation. 
+Simulated genomes with imposed known mutational signatures associated with cancer can be useful for benchmarking machine learning-based classifiers of genomic sequences and mutational signature extraction tools from mutational catalogs. SomaticSiMu extracts known signature data from a reference dataset of 2,780 whole cancer genomes from the [Pan-Cancer Analysis of Whole Genomes (PCAWG) 2020 database](https://www.nature.com/articles/s41586-020-1943-3), generates novel mutations on an input reference sequence that faithfully simulate real mutational signatures, and outputs the simulated mutated DNA sequence as a machine readable FASTA file and metadata in CSV files about the position, frequency, and local trinucleotide sequence context of each mutation. 
 
 SomaticSiMu is developed as a lightweight, stand alone, and parallel software tool with an optional graphical user interface, built in documentation, and visualization functions of mutation signature plots. The rich selection of input parameters and graphical user interface make SomaticSiMu both an easy to use application and effective as part of a wide range of experimental scenarios.  
 
@@ -33,7 +35,7 @@ SomaticSiMu is freely available on [GitHub](https://github.com/HillLab/SomaticSi
 Install SomaticSiMu to your working directory using the following command in a terminal.
 
 ```sh
-git clone https://github.com/HillLab/SomaticSiMu\
+git clone https://github.com/HillLab/SomaticSiMu
 ```
 
 
@@ -123,6 +125,8 @@ python SomaticSiMu.py -g 20 -c Kidney-RCC -r ./SomaticSiMu/Reference_genome/Homo
 ```
 
 #### Example 6: Using SomaticSiMu-GUI, visualize the mean proportions of each SBS mutation (based on the SBS-96 mutation classification scheme) of the 20 simulated sequences with imposed mutational signatures associated with Kidney Renal Cell Carcinoma from Example 5.
+
+Load the SomaticSiMu graphical user interface with the following command in terminal.
 
 ```sh
 python SomaticSiMu_GUI.py
