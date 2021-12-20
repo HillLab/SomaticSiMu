@@ -1556,7 +1556,7 @@ def main():
     #Initialize one iteration of the sequence to be mutated
     sample_seq = seq_slice(sequence_abs_path, slice_start, slice_end)
     
-    print("Input reference sequence successfully located and read.")
+    print("Input reference sequence successfully located and read. ")
     
     #Normalization
     normalization = args.normalization
