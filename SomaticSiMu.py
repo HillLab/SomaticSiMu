@@ -466,7 +466,7 @@ print("Cell 3 of 5 Loaded")
 
 #%%
 
-def sbs_mutation_probability(mut_sigs_directory, input_file_path, cancer_type, sample_seq, k3mer_count_map, std_outlier=3, power=1):
+def sbs_mutation_probability(mut_sigs_directory, input_file_path, cancer_type, sample_seq, k3mer_count_map, name, std_outlier=3, power=1):
 
     #Load dataset
     sbs_signature = sbs_prop_data.copy().iloc[:, 2:-2]
@@ -516,13 +516,15 @@ def sbs_mutation_probability(mut_sigs_directory, input_file_path, cancer_type, s
     #SBS signatures simulated
     sbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_sbs_sigs.txt'
     with open(sbs_sigs_path , 'a+') as outfile:
-        outfile.write(str(list(filtered_df.loc[sequence_index[0], :][filtered_df.loc[sequence_index[0], :] > 0].index)))
+        sbs_sig_list = list(filtered_df.loc[sequence_index[0], :][filtered_df.loc[sequence_index[0], :] > 0].index)
+        sbs_sig_list.insert(0, str(name))
+        outfile.write(str(sbs_sig_list))
         outfile.write("\n")
         
     mutation_probability_df['Probability'] = mutation_probability_df['Probability'] * power
     return mutation_probability_df.sort_values(by=["Type","SubType"])
 
-def dbs_mutation_probability(mut_sigs_directory, input_file_path, cancer_type, sample_seq, k2mer_count_map, std_outlier=3, power=1):
+def dbs_mutation_probability(mut_sigs_directory, input_file_path, cancer_type, sample_seq, k2mer_count_map, name, std_outlier=3, power=1):
 
     #Load dataset
     dbs_signature = dbs_prop_data.copy()
@@ -571,14 +573,16 @@ def dbs_mutation_probability(mut_sigs_directory, input_file_path, cancer_type, s
     #DBS signatures simulated
     dbs_sigs_path = mut_sigs_directory + "/" + cancer_type + '_dbs_sigs.txt'
     with open(dbs_sigs_path , 'a+') as outfile:
-        outfile.write(str(list(filtered_df.loc[sequence_index[0], :][filtered_df.loc[sequence_index[0], :] > 0].index)))
+        dbs_sig_list = list(filtered_df.loc[sequence_index[0], :][filtered_df.loc[sequence_index[0], :] > 0].index)
+        dbs_sig_list.insert(0, str(name))
+        outfile.write(str(dbs_sig_list))
         outfile.write("\n")
 
     mutation_probability_df['Probability'] = mutation_probability_df['Probability'] * power
     return mutation_probability_df.sort_values(['Mutation Type'])
     
     
-def indel_mutation_probability(mut_sigs_directory, input_file_path, cancer_type, sample_seq, k1mer_count_map, k2mer_count_map, k3mer_count_map, k4mer_count_map, k5mer_count_map, k6mer_count_map, std_outlier=3, power=1):
+def indel_mutation_probability(mut_sigs_directory, input_file_path, cancer_type, sample_seq, k1mer_count_map, k2mer_count_map, k3mer_count_map, k4mer_count_map, k5mer_count_map, k6mer_count_map, name, std_outlier=3, power=1):
 
     #Load dataset
     id_signature = id_prop_data.copy()
@@ -658,9 +662,11 @@ def indel_mutation_probability(mut_sigs_directory, input_file_path, cancer_type,
     #ID signatures simulated
     id_sigs_path = mut_sigs_directory + "/" + cancer_type + '_id_sigs.txt'
     with open(id_sigs_path , 'a+') as outfile:
-        outfile.write(str(list(filtered_df.loc[sequence_index[0], :][filtered_df.loc[sequence_index[0], :] > 0].index)))
+        id_sig_list = list(filtered_df.loc[sequence_index[0], :][filtered_df.loc[sequence_index[0], :] > 0].index)
+        id_sig_list.insert(0, str(name))
+        outfile.write(str(id_sig_list))
         outfile.write("\n")
-        
+
     mutation_probability_df['Probability'] = mutation_probability_df['Probability'] * power
     return mutation_probability_df
     
@@ -745,7 +751,7 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, sequence_abs_path, slic
     output_dbs_dict={}
 
     #Indel mutation probabilities
-    id_sorted_df = indel_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k1mer_count_map, k2mer_count_map, k3mer_count_map, k4mer_count_map, k5mer_count_map, k6mer_count_map,std_outlier=std_outlier, power=power)
+    id_sorted_df = indel_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k1mer_count_map, k2mer_count_map, k3mer_count_map, k4mer_count_map, k5mer_count_map, k6mer_count_map, name=number_of_lineages, std_outlier=std_outlier, power=power)
 
     deletion_df = id_sorted_df.copy().iloc[:12,:]
     deletion_df['Size'] = [1,2,3,4,5,6,1,2,3,4,5,6]
@@ -755,12 +761,12 @@ def somatic_sim(cancer_type, reading_frame, std_outlier, sequence_abs_path, slic
     print("Insertion and Deletion mutation probability matrix set up.")
     
     #SBS mutation probabilities
-    sbs_sorted_df = sbs_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k3mer_count_map, std_outlier=std_outlier, power=power)
+    sbs_sorted_df = sbs_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k3mer_count_map, name=number_of_lineages, std_outlier=std_outlier, power=power)
     
     print("Single Base Substitution mutation probability matrix set up.")
    
     #DBS mutation probabilities
-    dbs_sorted_df = dbs_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k2mer_count_map, std_outlier=std_outlier, power=power)
+    dbs_sorted_df = dbs_mutation_probability(mut_sigs_directory, sequence_abs_path, cancer_type, sample_seq, k2mer_count_map, name=number_of_lineages, std_outlier=std_outlier, power=power)
     dbs_sorted_df['Context'] = [x[:2] for x in dbs_sorted_df["Mutation Type"]]
     
     print("Double Base Substitution mutation probability matrix set up.")
