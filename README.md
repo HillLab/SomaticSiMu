@@ -184,6 +184,7 @@ Signature_Combinations | CSV file output of the signature combinations used for 
 ├── SomaticSiMu_GUI.py                                        // Simulation script (graphic user interface)
 ├── requirements.txt                                          // SomaticSiMu dependencies
 ├── setup.py                                                  // Optional automated setup script to download dependencies.
+├── SigProfilerExtractor_Benchmark                            // Scripts and example data to assess the performance of SigProfilerExtractor (Supplementary Section G)
 ├── README.md                                                 // README file.
 ├── LICENSE                                                   // Copy of Creative Commons Attribution 4.0 International License.
 </pre>
