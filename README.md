@@ -209,7 +209,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## Citing SomaticSiMu
 
-[Chen, D., Randhawa, G.S., Soltysiak, M.P.M., de Souza, C.P.E., Kari, L., Singh, S.M., Hill, K.A. (2021). SomaticSiMu: a mutational signature simulator. bioRxiv.](https://doi.org/10.1101/2021.09.30.462618)
+[David Chen, Gurjit S Randhawa, Maximillian P M Soltysiak, Camila P E de Souza, Lila Kari, Shiva M Singh, Kathleen A Hill, SomaticSiMu: a mutational signature simulator, Bioinformatics, Volume 38, Issue 9, March 2022, Pages 2619–2620](https://doi.org/10.1093/bioinformatics/btac128)
 
 
 ## License
